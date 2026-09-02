@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Brest Queue Monitor</title>
 
   <style>
@@ -193,6 +192,7 @@
 
   <header>
     <h1>🚗 Brest Queue Monitor</h1>
+
     <div class="subtitle">
       Elektroniczna kolejka Brest → Polska
     </div>
@@ -259,18 +259,22 @@
 
   <div class="section">
 
-    <h2>Trend kolejki</h2>
+    <h2>
+      Trend kolejki
+    </h2>
 
     <div id="trendText">
       Ładowanie...
     </div>
 
     <div class="chart-wrap">
+
       <svg
         id="chart"
         viewBox="0 0 900 260"
         preserveAspectRatio="none">
       </svg>
+
     </div>
 
   </div>
@@ -280,7 +284,9 @@
 
   <div class="section">
 
-    <h2>🎯 Kiedy chcesz być powołany?</h2>
+    <h2>
+      🎯 Kiedy chcesz być powołany?
+    </h2>
 
     <div class="target-grid">
 
@@ -327,28 +333,30 @@
 
   <div class="section">
 
-    <h2>ℹ️ Informacje</h2>
+    <h2>
+      ℹ️ Informacje
+    </h2>
 
     <div class="note">
 
-      Dane są pobierane automatycznie z monitoringu
-      kolejki i zapisywane w Supabase co 15 minut.
+      Dane są pobierane automatycznie z monitoringu kolejki
+      i zapisywane w Supabase co 15 minut.
 
       <br><br>
 
       Czasy w bazie są przechowywane w UTC.
-      Strona wyświetla czas zgodny ze strefą czasową
-      urządzenia.
+      Strona wyświetla czas zgodny ze strefą czasową urządzenia.
 
       <br><br>
 
       <strong>Uwaga:</strong>
-      aktualna wersja kalkulatora wykorzystuje
-      medianę historycznego czasu oczekiwania.
-      Jest to wersja robocza modelu — wraz z kolejnymi
-      danymi będziemy ją zastępować modelem
-      uwzględniającym dynamikę kolejki, przepustowość
-      i napływ nowych samochodów.
+      aktualna wersja kalkulatora wykorzystuje medianę
+      historycznego czasu oczekiwania.
+
+      Jest to wersja robocza modelu.
+
+      Wraz z kolejnymi danymi model będzie uwzględniał
+      dynamikę kolejki, przepustowość oraz napływ nowych samochodów.
 
     </div>
 
@@ -359,598 +367,698 @@
 
 <script>
 
-  /*
-   * SUPABASE
-   */
+/*
+====================================================
+ KONFIGURACJA
+====================================================
+*/
 
-  const SUPABASE_URL =
-    "https://fxunctikzhxvtdddorkp.supabase.co";
+const SUPABASE_URL =
+  "https://fxunctikzhxvtdddorkp.supabase.co";
 
-  const SUPABASE_KEY =
-    "sb_publishable_R3009GBuhlJ5_xD_0LOY0A_gDgsEwEK";
+const SUPABASE_KEY =
+  "sb_publishable_R3009GBuhlJ5_xD_0LOY0A_gDgsEwEK";
+
+const CHECKPOINT_ID =
+  "a9173a85-3fc0-424c-84f0-defa632481e4";
 
 
-  const CHECKPOINT_ID =
-    "a9173a85-3fc0-424c-84f0-defa632481e4";
+/*
+====================================================
+ POBIERANIE DANYCH Z SUPABASE
+====================================================
+*/
+
+async function supabaseFetch(table, query) {
+
+  const url =
+    SUPABASE_URL +
+    "/rest/v1/" +
+    table +
+    "?" +
+    query;
 
 
-  /*
-   * Pobieranie danych z Supabase REST API
-   */
+  const response = await fetch(url, {
 
-  async function supabaseFetch(
-    table,
-    query
-  ) {
+    headers: {
+      "apikey": SUPABASE_KEY
+    }
 
-    const url =
-      SUPABASE_URL +
-      "/rest/v1/" +
+  });
+
+
+  if (!response.ok) {
+
+    throw new Error(
       table +
-      "?" +
-      query;
+      " HTTP " +
+      response.status
+    );
 
-    const response =
-      await fetch(
-        url,
-        {
-          headers: {
-            "apikey":
-              SUPABASE_KEY,
+  }
 
-            "Authorization":
-              "Bearer " +
-              SUPABASE_KEY
-          }
-        }
+
+  return response.json();
+
+}
+
+
+/*
+====================================================
+ CZAS LOKALNY URZĄDZENIA
+====================================================
+*/
+
+function formatLocal(iso) {
+
+  return new Intl.DateTimeFormat(
+    undefined,
+    {
+      dateStyle: "short",
+      timeStyle: "medium"
+    }
+  ).format(
+    new Date(iso)
+  );
+
+}
+
+
+/*
+====================================================
+ ŁADOWANIE DANYCH
+====================================================
+*/
+
+async function loadData() {
+
+  try {
+
+    /*
+    ----------------------------------------------
+    OSTATNIE SNAPSHOTY
+    ----------------------------------------------
+    */
+
+    const snapshots =
+      await supabaseFetch(
+
+        "queue_snapshots",
+
+        "checkpoint_id=eq." +
+        CHECKPOINT_ID +
+
+        "&select=" +
+        "captured_at," +
+        "waiting_cars," +
+        "called_cars," +
+        "monitoring_count" +
+
+        "&order=captured_at.desc" +
+
+        "&limit=96"
+
       );
 
-    if (!response.ok) {
+
+    /*
+    ----------------------------------------------
+    PRZEPUSTOWOŚĆ
+    ----------------------------------------------
+    */
+
+    const stats =
+      await supabaseFetch(
+
+        "processing_stats",
+
+        "checkpoint_id=eq." +
+        CHECKPOINT_ID +
+
+        "&select=" +
+        "captured_at," +
+        "car_last_hour," +
+        "car_last_day" +
+
+        "&order=captured_at.desc" +
+
+        "&limit=1"
+
+      );
+
+
+    /*
+    ----------------------------------------------
+    BRAK DANYCH
+    ----------------------------------------------
+    */
+
+    if (!snapshots.length) {
 
       throw new Error(
-        table +
-        " HTTP " +
-        response.status
+        "Brak danych w queue_snapshots"
       );
 
     }
 
-    return response.json();
-  }
+
+    /*
+    ----------------------------------------------
+    NAJNOWSZY POMIAR
+    ----------------------------------------------
+    */
+
+    const latest =
+      snapshots[0];
 
 
-  /*
-   * Format czasu lokalnego
-   */
-
-  function formatLocal(
-    iso
-  ) {
-
-    return new Intl.DateTimeFormat(
-      undefined,
-      {
-        dateStyle: "short",
-        timeStyle: "medium"
-      }
-    ).format(
-      new Date(iso)
-    );
-
-  }
+    document.getElementById(
+      "waiting"
+    ).textContent =
+      latest.waiting_cars;
 
 
-  /*
-   * ŁADOWANIE DANYCH
-   */
-
-  async function loadData() {
-
-    try {
-
-      const snapshots =
-        await supabaseFetch(
-          "queue_snapshots",
-
-          "checkpoint_id=eq." +
-          CHECKPOINT_ID +
-          "&select=captured_at,waiting_cars,called_cars,monitoring_count" +
-          "&order=captured_at.desc" +
-          "&limit=96"
-        );
+    document.getElementById(
+      "called"
+    ).textContent =
+      latest.called_cars;
 
 
-      const stats =
-        await supabaseFetch(
-          "processing_stats",
+    /*
+    ----------------------------------------------
+    PRZEPUSTOWOŚĆ
+    ----------------------------------------------
+    */
 
-          "checkpoint_id=eq." +
-          CHECKPOINT_ID +
-          "&select=captured_at,car_last_hour,car_last_day" +
-          "&order=captured_at.desc" +
-          "&limit=1"
-        );
-
-
-      if (!snapshots.length) {
-
-        throw new Error(
-          "Brak danych w queue_snapshots"
-        );
-
-      }
-
-
-      const latest =
-        snapshots[0];
-
+    if (stats.length) {
 
       document.getElementById(
-        "waiting"
+        "rate"
       ).textContent =
-        latest.waiting_cars;
+        stats[0].car_last_hour;
+
+    }
 
 
-      document.getElementById(
-        "called"
-      ).textContent =
-        latest.called_cars;
+    /*
+    ----------------------------------------------
+    TREND
+    ----------------------------------------------
+    */
+
+    if (snapshots.length >= 2) {
+
+      const previous =
+        snapshots[1];
 
 
-      /*
-       * Przepustowość
-       */
+      const diff =
+        latest.waiting_cars -
+        previous.waiting_cars;
 
-      if (stats.length) {
 
-        const hourly =
-          stats[0].car_last_hour;
+      if (diff < 0) {
 
         document.getElementById(
-          "rate"
+          "trendText"
         ).textContent =
-          hourly;
+          "↓ Kolejka obecnie maleje (" +
+          Math.abs(diff) +
+          " aut względem poprzedniego pomiaru).";
 
       }
 
+      else if (diff > 0) {
 
-      /*
-       * Trend
-       */
-
-      if (snapshots.length >= 2) {
-
-        const previous =
-          snapshots[1];
-
-        const diff =
-          latest.waiting_cars -
-          previous.waiting_cars;
-
-
-        if (diff < 0) {
-
-          document.getElementById(
-            "trendText"
-          ).textContent =
-            "↓ Kolejka obecnie maleje (" +
-            Math.abs(diff) +
-            " aut względem poprzedniego pomiaru).";
-
-        }
-        else if (diff > 0) {
-
-          document.getElementById(
-            "trendText"
-          ).textContent =
-            "↑ Kolejka obecnie rośnie (" +
-            diff +
-            " aut względem poprzedniego pomiaru).";
-
-        }
-        else {
-
-          document.getElementById(
-            "trendText"
-          ).textContent =
-            "→ Kolejka bez większej zmiany.";
-
-        }
+        document.getElementById(
+          "trendText"
+        ).textContent =
+          "↑ Kolejka obecnie rośnie (" +
+          diff +
+          " aut względem poprzedniego pomiaru).";
 
       }
 
+      else {
 
-      /*
-       * Wykres
-       */
+        document.getElementById(
+          "trendText"
+        ).textContent =
+          "→ Kolejka bez większej zmiany.";
 
-      drawChart(
-        snapshots
-          .slice()
-          .reverse()
-      );
-
-
-      document.getElementById(
-        "status"
-      ).textContent =
-        "Ostatnia aktualizacja: " +
-        formatLocal(
-          latest.captured_at
-        );
-
-
-    }
-    catch (error) {
-
-      console.error(error);
-
-      document.getElementById(
-        "status"
-      ).innerHTML =
-        '<div class="error">' +
-        "Błąd pobierania danych: " +
-        error.message +
-        "</div>";
-
-    }
-
-  }
-
-
-  /*
-   * RYSOWANIE WYKRESU
-   */
-
-  function drawChart(
-    data
-  ) {
-
-    const svg =
-      document.getElementById(
-        "chart"
-      );
-
-
-    svg.innerHTML = "";
-
-
-    if (!data.length) {
-      return;
-    }
-
-
-    const width = 900;
-    const height = 260;
-
-    const padding = 35;
-
-
-    const values =
-      data.map(
-        x => Number(
-          x.waiting_cars
-        )
-      );
-
-
-    const min =
-      Math.min(...values);
-
-    const max =
-      Math.max(...values);
-
-
-    const range =
-      Math.max(
-        max - min,
-        1
-      );
-
-
-    const points =
-      data.map(
-        (item, index) => {
-
-          const x =
-            padding +
-            (
-              index /
-              Math.max(
-                data.length - 1,
-                1
-              )
-            ) *
-            (
-              width -
-              padding * 2
-            );
-
-
-          const y =
-            height -
-            padding -
-            (
-              (
-                item.waiting_cars -
-                min
-              ) /
-              range
-            ) *
-            (
-              height -
-              padding * 2
-            );
-
-
-          return (
-            x +
-            "," +
-            y
-          );
-
-        }
-      )
-      .join(" ");
-
-
-    const polyline =
-      document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "polyline"
-      );
-
-
-    polyline.setAttribute(
-      "points",
-      points
-    );
-
-    polyline.setAttribute(
-      "fill",
-      "none"
-    );
-
-    polyline.setAttribute(
-      "stroke",
-      "currentColor"
-    );
-
-    polyline.setAttribute(
-      "stroke-width",
-      "3"
-    );
-
-
-    svg.appendChild(
-      polyline
-    );
-
-
-    /*
-     * Opis minimum / maksimum
-     */
-
-    const labelMin =
-      document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "text"
-      );
-
-    labelMin.setAttribute(
-      "x",
-      "10"
-    );
-
-    labelMin.setAttribute(
-      "y",
-      height - padding
-    );
-
-    labelMin.textContent =
-      Math.round(min);
-
-
-    svg.appendChild(
-      labelMin
-    );
-
-
-    const labelMax =
-      document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "text"
-      );
-
-    labelMax.setAttribute(
-      "x",
-      "10"
-    );
-
-    labelMax.setAttribute(
-      "y",
-      "25"
-    );
-
-    labelMax.textContent =
-      Math.round(max);
-
-
-    svg.appendChild(
-      labelMax
-    );
-
-  }
-
-
-  /*
-   * KALKULATOR CELU
-   */
-
-  function calculateTarget() {
-
-    const date =
-      document.getElementById(
-        "targetDate"
-      ).value;
-
-
-    const time =
-      document.getElementById(
-        "targetTime"
-      ).value;
-
-
-    if (!date || !time) {
-
-      alert(
-        "Wybierz datę i godzinę."
-      );
-
-      return;
+      }
 
     }
 
 
     /*
-     * Aktualna mediana:
-     *
-     * 22.89 h
-     *
-     * To wartość z naszej obecnej
-     * próbki 30 zakończonych przypadków.
-     */
+    ----------------------------------------------
+    WYKRES
+    ----------------------------------------------
+    */
 
-    const medianHours =
-      22.89;
+    drawChart(
+      snapshots
+        .slice()
+        .reverse()
+    );
 
 
-    const target =
-      new Date(
-        date +
-        "T" +
-        time
+    /*
+    ----------------------------------------------
+    STATUS
+    ----------------------------------------------
+    */
+
+    document.getElementById(
+      "status"
+    ).textContent =
+      "Ostatnia aktualizacja: " +
+      formatLocal(
+        latest.captured_at
       );
 
-
-    const registration =
-      new Date(
-        target.getTime() -
-        medianHours *
-        60 *
-        60 *
-        1000
-      );
+  }
 
 
-    const result =
-      document.getElementById(
-        "result"
-      );
+  catch (error) {
+
+    console.error(error);
 
 
-    result.style.display =
-      "block";
-
-
-    result.innerHTML =
-
-      "<div>🎯 Cel:</div>" +
-
-      '<div class="result-big">' +
-      target.toLocaleString() +
-      "</div>" +
-
-      "<div>Orientacyjna rejestracja:</div>" +
-
-      '<div class="result-big">' +
-      registration.toLocaleString() +
-      "</div>" +
-
-      '<div class="note">' +
-
-      "Obliczenie wykorzystuje obecną " +
-      "medianę oczekiwania: " +
-      medianHours.toFixed(2) +
-      " h (" +
-      Math.floor(medianHours) +
-      " h " +
-      Math.round(
-        (medianHours % 1) * 60
-      ) +
-      " min)." +
-
-      "<br><br>" +
-
-      "To jeszcze nie jest przedział " +
-      "bezpieczeństwa. Model będziemy " +
-      "udoskonalać na podstawie kolejnych " +
-      "automatycznych pomiarów." +
-
+    document.getElementById(
+      "status"
+    ).innerHTML =
+      '<div class="error">' +
+      "Błąd pobierania danych: " +
+      error.message +
       "</div>";
 
   }
 
+}
 
-  /*
-   * DOM READY
-   */
 
-  function setDefaultDate() {
+/*
+====================================================
+ WYKRES
+====================================================
+*/
 
-    /*
-     * Domyślnie następne 3 dni.
-     * Użytkownik może wpisać dowolną datę.
-     */
+function drawChart(data) {
 
-    const now =
-      new Date();
-
-    now.setDate(
-      now.getDate() + 3
+  const svg =
+    document.getElementById(
+      "chart"
     );
 
 
-    const yyyy =
-      now.getFullYear();
-
-    const mm =
-      String(
-        now.getMonth() + 1
-      ).padStart(2, "0");
-
-    const dd =
-      String(
-        now.getDate()
-      ).padStart(2, "0");
+  svg.innerHTML = "";
 
 
+  if (!data.length) {
+    return;
+  }
+
+
+  const width = 900;
+  const height = 260;
+  const padding = 35;
+
+
+  const values =
+    data.map(
+      x => Number(
+        x.waiting_cars
+      )
+    );
+
+
+  const min =
+    Math.min(...values);
+
+
+  const max =
+    Math.max(...values);
+
+
+  const range =
+    Math.max(
+      max - min,
+      1
+    );
+
+
+  const points =
+    data.map(
+      (item, index) => {
+
+        const x =
+          padding +
+          (
+            index /
+            Math.max(
+              data.length - 1,
+              1
+            )
+          ) *
+          (
+            width -
+            padding * 2
+          );
+
+
+        const y =
+          height -
+          padding -
+          (
+            (
+              item.waiting_cars -
+              min
+            ) /
+            range
+          ) *
+          (
+            height -
+            padding * 2
+          );
+
+
+        return x + "," + y;
+
+      }
+    ).join(" ");
+
+
+  const polyline =
+    document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "polyline"
+    );
+
+
+  polyline.setAttribute(
+    "points",
+    points
+  );
+
+
+  polyline.setAttribute(
+    "fill",
+    "none"
+  );
+
+
+  polyline.setAttribute(
+    "stroke",
+    "currentColor"
+  );
+
+
+  polyline.setAttribute(
+    "stroke-width",
+    "3"
+  );
+
+
+  svg.appendChild(
+    polyline
+  );
+
+
+  /*
+  ----------------------------------------------
+  MIN
+  ----------------------------------------------
+  */
+
+  const labelMin =
+    document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "text"
+    );
+
+
+  labelMin.setAttribute(
+    "x",
+    "10"
+  );
+
+
+  labelMin.setAttribute(
+    "y",
+    height - padding
+  );
+
+
+  labelMin.textContent =
+    Math.round(min);
+
+
+  svg.appendChild(
+    labelMin
+  );
+
+
+  /*
+  ----------------------------------------------
+  MAX
+  ----------------------------------------------
+  */
+
+  const labelMax =
+    document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "text"
+    );
+
+
+  labelMax.setAttribute(
+    "x",
+    "10"
+  );
+
+
+  labelMax.setAttribute(
+    "y",
+    "25"
+  );
+
+
+  labelMax.textContent =
+    Math.round(max);
+
+
+  svg.appendChild(
+    labelMax
+  );
+
+}
+
+
+/*
+====================================================
+ KALKULATOR
+====================================================
+*/
+
+function calculateTarget() {
+
+  const date =
     document.getElementById(
       "targetDate"
-    ).value =
-      yyyy +
-      "-" +
-      mm +
-      "-" +
-      dd;
+    ).value;
+
+
+  const time =
+    document.getElementById(
+      "targetTime"
+    ).value;
+
+
+  if (!date || !time) {
+
+    alert(
+      "Wybierz datę i godzinę."
+    );
+
+    return;
 
   }
 
 
-  setDefaultDate();
+  /*
+  ----------------------------------------------
+  OBECNA MEDIANA
+  ----------------------------------------------
+  */
 
-  loadData();
+  const medianHours =
+    22.89;
 
 
   /*
-   * Odświeżamy dane strony
-   * co 60 sekund.
-   */
+  ----------------------------------------------
+  CEL
+  ----------------------------------------------
+  */
 
-  setInterval(
-    loadData,
-    60 * 1000
+  const target =
+    new Date(
+      date +
+      "T" +
+      time
+    );
+
+
+  /*
+  ----------------------------------------------
+  ORIENTACYJNA REJESTRACJA
+  ----------------------------------------------
+  */
+
+  const registration =
+    new Date(
+      target.getTime() -
+      medianHours *
+      60 *
+      60 *
+      1000
+    );
+
+
+  /*
+  ----------------------------------------------
+  WYNIK
+  ----------------------------------------------
+  */
+
+  const result =
+    document.getElementById(
+      "result"
+    );
+
+
+  result.style.display =
+    "block";
+
+
+  result.innerHTML =
+
+    "<div>🎯 Cel:</div>" +
+
+    '<div class="result-big">' +
+    target.toLocaleString() +
+    "</div>" +
+
+    "<div>Orientacyjna rejestracja:</div>" +
+
+    '<div class="result-big">' +
+    registration.toLocaleString() +
+    "</div>" +
+
+    '<div class="note">' +
+
+    "Obliczenie wykorzystuje obecną " +
+    "medianę oczekiwania: " +
+
+    medianHours.toFixed(2) +
+
+    " h (" +
+
+    Math.floor(
+      medianHours
+    ) +
+
+    " h " +
+
+    Math.round(
+      (
+        medianHours % 1
+      ) * 60
+    ) +
+
+    " min)." +
+
+    "<br><br>" +
+
+    "To jeszcze nie jest przedział bezpieczeństwa. " +
+
+    "Model będziemy udoskonalać na podstawie " +
+    "kolejnych automatycznych pomiarów." +
+
+    "</div>";
+
+}
+
+
+/*
+====================================================
+ DOMYŚLNA DATA
+====================================================
+*/
+
+function setDefaultDate() {
+
+  const now =
+    new Date();
+
+
+  now.setDate(
+    now.getDate() + 3
   );
+
+
+  const yyyy =
+    now.getFullYear();
+
+
+  const mm =
+    String(
+      now.getMonth() + 1
+    ).padStart(2, "0");
+
+
+  const dd =
+    String(
+      now.getDate()
+    ).padStart(2, "0");
+
+
+  document.getElementById(
+    "targetDate"
+  ).value =
+    yyyy +
+    "-" +
+    mm +
+    "-" +
+    dd;
+
+}
+
+
+/*
+====================================================
+ START
+====================================================
+*/
+
+setDefaultDate();
+
+loadData();
+
+
+/*
+====================================================
+ AUTOMATYCZNE ODŚWIEŻANIE
+====================================================
+*/
+
+setInterval(
+  loadData,
+  60 * 1000
+);
 
 </script>
 
