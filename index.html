@@ -1,319 +1,395 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brest BTS — monitor kolejki</title>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Brest Queue Monitor</title>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
 
     body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f4f6f8;
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+      background: #f5f7fb;
       color: #1f2937;
     }
 
     .container {
-      width: 100%;
       max-width: 1200px;
       margin: 0 auto;
-      padding: 24px 18px 50px;
+      padding: 24px;
     }
 
     h1 {
-      margin: 0 0 6px;
-      font-size: 34px;
-      line-height: 1.15;
+      margin: 0 0 8px 0;
+      font-size: 30px;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 21px;
     }
 
     .subtitle {
       color: #6b7280;
-      font-size: 18px;
       margin-bottom: 24px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 14px;
-      padding: 18px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-      min-width: 0;
-    }
-
-    .label {
-      font-size: 15px;
-      color: #6b7280;
-      margin-bottom: 7px;
-    }
-
-    .value {
-      font-size: 30px;
-      font-weight: 700;
-      line-height: 1.1;
-      margin-bottom: 9px;
-    }
-
-    .unit {
-      font-size: 14px;
-      font-weight: 400;
-      color: #6b7280;
-    }
-
-    .card-description {
-      font-size: 12px;
-      line-height: 1.45;
-      color: #6b7280;
-      border-top: 1px solid #f0f0f0;
-      padding-top: 9px;
+      line-height: 1.5;
     }
 
     .section {
       background: white;
       border-radius: 14px;
-      padding: 22px;
-      margin-top: 18px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow:
+        0 2px 10px rgba(0,0,0,0.05);
     }
 
-    .section h2 {
-      margin: 0 0 18px;
-      font-size: 23px;
+    .cards {
+      display: grid;
+      grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+      gap: 14px;
     }
 
-    .small {
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 17px;
+    }
+
+    .card-title {
       font-size: 14px;
       color: #6b7280;
-      line-height: 1.55;
+      margin-bottom: 7px;
     }
 
-    /* WYKRES */
+    .card-value {
+      font-size: 29px;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
 
-    .chart-toolbar {
+    .card-description {
+      font-size: 12px;
+      color: #6b7280;
+      line-height: 1.45;
+    }
+
+    .blue {
+      color: #2563eb;
+    }
+
+    .green {
+      color: #059669;
+    }
+
+    .orange {
+      color: #d97706;
+    }
+
+    .red {
+      color: #dc2626;
+    }
+
+    .gray {
+      color: #6b7280;
+    }
+
+    .model-status {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 9px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .chart-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 15px;
+      gap: 15px;
       flex-wrap: wrap;
+      margin-bottom: 12px;
     }
 
-    .range-buttons {
+    .chart-buttons {
       display: flex;
       gap: 8px;
     }
 
-    .range-button {
-      border: 1px solid #d1d5db;
-      background: white;
-      color: #374151;
+    button {
+      border: 0;
       border-radius: 8px;
-      padding: 8px 13px;
+      padding: 9px 13px;
       cursor: pointer;
-      font-size: 14px;
+      background: #e5e7eb;
+      color: #1f2937;
+      font-weight: 600;
     }
 
-    .range-button:hover {
-      background: #f3f4f6;
-    }
-
-    .range-button.active {
-      background: #1f2937;
+    button.active {
+      background: #2563eb;
       color: white;
-      border-color: #1f2937;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .chart-description {
+      color: #6b7280;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 12px;
     }
 
     .chart-wrap {
-      position: relative;
       width: 100%;
-      height: 390px;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 10px;
-      background: #fff;
+      height: 360px;
+      position: relative;
+      overflow: hidden;
     }
 
-    canvas {
+    #queueChart {
+      display: block;
       width: 100%;
       height: 100%;
-      display: block;
+      touch-action: none;
     }
 
-    .chart-info {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    .chart-stat {
-      background: #f9fafb;
-      border-radius: 10px;
-      padding: 12px 14px;
-    }
-
-    .chart-stat-title {
+    .chart-stats {
+      margin-top: 12px;
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
       font-size: 13px;
       color: #6b7280;
-      margin-bottom: 4px;
     }
 
-    .chart-stat-value {
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    .chart-stat-description {
-      font-size: 12px;
+    .chart-legend {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      font-size: 13px;
       color: #6b7280;
-      line-height: 1.4;
-      margin-top: 5px;
     }
 
-    /* KALKULATOR */
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
 
-    .target-row {
+    .legend-line {
+      width: 22px;
+      height: 3px;
+      background: #2563eb;
+      border-radius: 3px;
+    }
+
+    .stats-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns:
+        repeat(4, minmax(0, 1fr));
       gap: 14px;
-      margin-top: 14px;
+    }
+
+    .stat-box {
+      border: 1px solid #e5e7eb;
+      border-radius: 11px;
+      padding: 15px;
+    }
+
+    .stat-value {
+      font-size: 25px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .stat-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .stat-description {
+      font-size: 12px;
+      line-height: 1.45;
+      color: #6b7280;
+    }
+
+    .calculator {
+      display: grid;
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .input-description {
+      color: #6b7280;
+      font-size: 12px;
+      line-height: 1.4;
     }
 
     input,
     select {
       width: 100%;
-      padding: 12px;
+      padding: 11px 12px;
       border: 1px solid #d1d5db;
-      border-radius: 9px;
-      font-size: 16px;
+      border-radius: 8px;
       background: white;
+      font-size: 15px;
     }
 
-    .field-description {
-      font-size: 12px;
-      line-height: 1.45;
-      color: #6b7280;
-      margin-top: 7px;
-    }
-
-    .result {
-      margin-top: 18px;
+    .calculator-result {
+      grid-column: 1 / -1;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 12px;
       padding: 18px;
-      background: #f3f4f6;
-      border-radius: 10px;
     }
 
-    .result-block {
-      margin-bottom: 17px;
+    .result-title {
+      color: #166534;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 7px;
     }
 
-    .result-block:last-child {
-      margin-bottom: 0;
-    }
-
-    .result strong {
-      font-size: 21px;
+    .result-value {
+      color: #166534;
+      font-size: 27px;
+      font-weight: 700;
+      margin-bottom: 7px;
     }
 
     .result-description {
+      color: #166534;
       font-size: 13px;
-      color: #6b7280;
-      line-height: 1.45;
-      margin-top: 5px;
-    }
-
-    /* STATUS */
-
-    .status {
-      margin-top: 20px;
-      padding: 12px 14px;
-      border-radius: 9px;
-      background: #eef2ff;
-      color: #3730a3;
-      font-size: 14px;
-    }
-
-    .warning {
-      background: #fff7ed;
-      color: #9a3412;
-    }
-
-    .ok {
-      background: #ecfdf5;
-      color: #065f46;
-    }
-
-    .error {
-      background: #fef2f2;
-      color: #991b1b;
-    }
-
-    .quality {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      background: #fef3c7;
-      color: #92400e;
-      margin-top: 4px;
-    }
-
-    .explanation {
-      background: #f9fafb;
-      border-left: 4px solid #d1d5db;
-      padding: 13px 15px;
-      border-radius: 8px;
-      margin-top: 15px;
-      font-size: 13px;
-      line-height: 1.55;
-      color: #4b5563;
-    }
-
-    .footer {
-      margin-top: 24px;
-      color: #6b7280;
-      font-size: 12px;
       line-height: 1.5;
     }
 
-    @media (max-width: 850px) {
-      .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .chart-info {
-        grid-template-columns: 1fr;
-      }
+    .dynamics-grid {
+      display: grid;
+      grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+      gap: 14px;
     }
 
-    @media (max-width: 600px) {
+    .dynamic-box {
+      border: 1px solid #e5e7eb;
+      border-radius: 11px;
+      padding: 14px;
+    }
+
+    .dynamic-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .dynamic-value {
+      font-size: 23px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .dynamic-description {
+      color: #6b7280;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .info-box {
+      padding: 15px;
+      background: #f9fafb;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .info-box + .info-box {
+      margin-top: 12px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 12px;
+      padding: 10px 0 30px;
+    }
+
+    .loading {
+      color: #6b7280;
+    }
+
+    .error {
+      color: #dc2626;
+    }
+
+    @media (max-width: 900px) {
+
+      .cards {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+      }
+
+      .stats-grid {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+      }
+
+      .dynamics-grid {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+      }
+
+    }
+
+    @media (max-width: 650px) {
+
       .container {
-        padding: 18px 12px 40px;
+        padding: 14px;
       }
 
       h1 {
-        font-size: 27px;
+        font-size: 24px;
       }
 
-      .subtitle {
-        font-size: 16px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .target-row {
+      .cards,
+      .stats-grid,
+      .dynamics-grid,
+      .calculator {
         grid-template-columns: 1fr;
       }
 
@@ -321,10 +397,12 @@
         height: 300px;
       }
 
-      .value {
-        font-size: 27px;
+      .calculator-result {
+        grid-column: auto;
       }
+
     }
+
   </style>
 </head>
 
@@ -332,271 +410,109 @@
 
 <div class="container">
 
-  <h1>🚗 Brest BTS — monitor kolejki</h1>
+  <h1>Brest Queue Monitor</h1>
 
   <div class="subtitle">
-    Elektroniczna kolejka samochodów • dane aktualizowane automatycznie
+    Monitoring elektronicznej kolejki samochodów
+    na przejściu Brest–Terespol.
+    Dane są pobierane automatycznie i służą
+    do szacowania czasu oczekiwania.
   </div>
 
 
-  <!-- ==========================================================
+  <!-- =========================================================
        AKTUALNY STAN
-       ========================================================== -->
-
-  <div class="grid">
-
-    <div class="card">
-      <div class="label">Samochody oczekujące</div>
-
-      <div class="value" id="waitingCars">—</div>
-
-      <div class="card-description">
-        Liczba samochodów, które są obecnie widoczne jako oczekujące
-        w monitoringu.
-      </div>
-    </div>
-
-
-    <div class="card">
-      <div class="label">Samochody wywołane</div>
-
-      <div class="value" id="calledCars">—</div>
-
-      <div class="card-description">
-        Samochody, których kolej już nadeszła i zostały wywołane
-        do dalszego przejazdu.
-      </div>
-    </div>
-
-
-    <div class="card">
-      <div class="label">Monitoring / API</div>
-
-      <div class="value" id="monitoringCount">—</div>
-
-      <div class="card-description">
-        Łączna liczba samochodów widocznych w danych monitoringu
-        w ostatnim odczycie.
-      </div>
-    </div>
-
-
-    <div class="card">
-      <div class="label">Zmiana kolejki — 1 h</div>
-
-      <div class="value">
-        <span id="change1h">—</span>
-        <span class="unit">aut./h</span>
-      </div>
-
-      <div class="card-description">
-        Pokazuje, jak szybko zmienia się liczba obserwowanych samochodów.
-        Minus oznacza, że kolejka maleje.
-      </div>
-    </div>
-
-  </div>
-
-
-  <!-- ==========================================================
-       WYKRES
-       ========================================================== -->
+       ========================================================= -->
 
   <div class="section">
 
-    <h2>📈 Historia kolejki</h2>
+    <h2>Aktualny stan</h2>
 
-    <div class="chart-toolbar">
+    <div class="cards">
 
-      <div class="small">
-        Zmiana liczby samochodów obserwowanych przez monitoring
-      </div>
+      <div class="card">
 
-      <div class="range-buttons">
+        <div class="card-title">
+          Oczekujące samochody
+        </div>
 
-        <button
-          class="range-button active"
-          id="btn6h"
-          onclick="setChartRange(6)"
+        <div
+          id="waitingCars"
+          class="card-value blue"
         >
-          Ostatnie 6 h
-        </button>
+          —
+        </div>
 
-        <button
-          class="range-button"
-          id="btn24h"
-          onclick="setChartRange(24)"
+        <div class="card-description">
+          Liczba samochodów ze statusem
+          oczekiwania widocznych w aktualnym
+          odczycie systemu monitoringu.
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="card-title">
+          Wywołane samochody
+        </div>
+
+        <div
+          id="calledCars"
+          class="card-value green"
         >
-          Ostatnie 24 h
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <div class="chart-wrap">
-      <canvas id="queueChart"></canvas>
-    </div>
-
-
-    <div class="chart-info">
-
-      <div class="chart-stat">
-
-        <div class="chart-stat-title">
-          Na początku zakresu
-        </div>
-
-        <div class="chart-stat-value" id="chartStart">
           —
         </div>
 
-        <div class="chart-stat-description">
-          Tyle samochodów było widocznych na początku wybranego okresu.
+        <div class="card-description">
+          Samochody ze statusem „wywołany”,
+          czyli takie, których kolej została
+          już osiągnięta.
         </div>
 
       </div>
 
 
-      <div class="chart-stat">
+      <div class="card">
 
-        <div class="chart-stat-title">
-          Aktualnie
+        <div class="card-title">
+          Monitoring
         </div>
 
-        <div class="chart-stat-value" id="chartCurrent">
+        <div
+          id="monitoringCount"
+          class="card-value orange"
+        >
           —
         </div>
 
-        <div class="chart-stat-description">
-          Najnowszy dostępny odczyt z naszego monitoringu.
+        <div class="card-description">
+          Łączna liczba rekordów samochodów
+          widocznych w bieżącym wycinku
+          monitoringu.
         </div>
 
       </div>
 
 
-      <div class="chart-stat">
+      <div class="card">
 
-        <div class="chart-stat-title">
-          Zmiana w okresie
+        <div class="card-title">
+          Ostatnia aktualizacja
         </div>
 
-        <div class="chart-stat-value" id="chartChange">
+        <div
+          id="latestUpdate"
+          class="card-value gray"
+          style="font-size:20px;"
+        >
           —
         </div>
 
-        <div class="chart-stat-description">
-          Różnica między początkiem a końcem wybranego okresu.
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <div class="explanation">
-
-      <b>Jak czytać wykres?</b><br>
-
-      Linia opadająca oznacza, że liczba obserwowanych samochodów
-      maleje. Linia rosnąca oznacza, że samochodów przybywa.
-      Im bardziej stromy spadek, tym szybciej zmniejsza się
-      obserwowana liczba pojazdów.
-
-      <br><br>
-
-      <b>Ważne:</b> wykres pokazuje dane dostępne w naszym monitoringu
-      API. Nie należy automatycznie utożsamiać tej liczby z pełną
-      oficjalną kolejką na granicy.
-
-    </div>
-
-  </div>
-
-
-  <!-- ==========================================================
-       CZAS OCZEKIWANIA
-       ========================================================== -->
-
-  <div class="section">
-
-    <h2>⏱️ Szacowany czas oczekiwania</h2>
-
-
-    <div class="grid">
-
-      <div class="card">
-
-        <div class="label">
-          P25
-        </div>
-
-        <div class="value">
-          <span id="p25">—</span>
-          <span class="unit">h</span>
-        </div>
-
         <div class="card-description">
-          Krótszy wariant oczekiwania. Około 25% zebranych
-          przejazdów miało czas oczekiwania nie dłuższy niż ta wartość.
-        </div>
-
-      </div>
-
-
-      <div class="card">
-
-        <div class="label">
-          Mediana
-        </div>
-
-        <div class="value">
-          <span id="median">—</span>
-          <span class="unit">h</span>
-        </div>
-
-        <div class="card-description">
-          Najbardziej typowy czas oczekiwania. Połowa obserwowanych
-          przejazdów trwała krócej, a połowa dłużej.
-        </div>
-
-      </div>
-
-
-      <div class="card">
-
-        <div class="label">
-          P75
-        </div>
-
-        <div class="value">
-          <span id="p75">—</span>
-          <span class="unit">h</span>
-        </div>
-
-        <div class="card-description">
-          Ostrożniejszy wariant. Około 75% zebranych przejazdów
-          miało czas oczekiwania nie dłuższy niż ta wartość.
-        </div>
-
-      </div>
-
-
-      <div class="card">
-
-        <div class="label">
-          P90 — ostrożnie
-        </div>
-
-        <div class="value">
-          <span id="p90">—</span>
-          <span class="unit">h</span>
-        </div>
-
-        <div class="card-description">
-          Bardzo ostrożny wariant. Około 90% zebranych przejazdów
-          zmieściło się w tym czasie.
+          Moment ostatniego pobrania danych
+          przez nasz kolektor.
         </div>
 
       </div>
@@ -606,369 +522,548 @@
 
     <div
       id="modelStatus"
-      class="quality"
+      class="model-status"
     >
-      Ładowanie modelu...
+      Ładowanie modelu…
     </div>
-
-
-    <div class="explanation">
-
-      <b>Co wybrać?</b><br>
-
-      Jeśli zależy Ci na najbardziej typowym scenariuszu,
-      wybierz <b>medianę</b>.
-
-      Jeśli chcesz mieć większy zapas czasu,
-      wybierz <b>P75</b>.
-
-      Jeśli bardzo zależy Ci na ograniczeniu ryzyka spóźnienia,
-      wybierz <b>P90</b>.
-
-    </div>
-
-
-    <p class="small">
-
-      Model jest statystycznym oszacowaniem. Nie może zagwarantować
-      dokładnej godziny wywołania, ponieważ rzeczywisty czas zależy
-      m.in. od napływu nowych samochodów i tempa obsługi granicy.
-
-    </p>
 
   </div>
 
 
-  <!-- ==========================================================
-       KALKULATOR
-       ========================================================== -->
+
+  <!-- =========================================================
+       WYKRES
+       ========================================================= -->
 
   <div class="section">
 
-    <h2>🎯 Kiedy zapisać się do kolejki?</h2>
-
-
-    <p class="small">
-
-      Wybierz godzinę, o której chcesz zostać wywołany.
-      Kalkulator cofnie się o przewidywany czas oczekiwania
-      i poda orientacyjną godzinę zapisania się do kolejki.
-
-    </p>
-
-
-    <div class="target-row">
-
+    <div class="chart-header">
 
       <div>
+        <h2 style="margin-bottom:4px;">
+          Historia kolejki
+        </h2>
 
-        <div class="label">
-          Docelowa data i godzina
+        <div class="chart-description">
+          Wykres pokazuje, jak zmieniała się
+          liczba oczekujących samochodów
+          w kolejnych odczytach.
+          Najedź na punkt, aby zobaczyć
+          dokładną godzinę i wartości.
         </div>
-
-        <input
-          type="datetime-local"
-          id="targetDate"
-        />
-
-        <div class="field-description">
-          Wpisz godzinę, o której chcesz być wywołany.
-          Kalkulator użyje czasu lokalnego Twojego urządzenia.
-        </div>
-
       </div>
 
 
-      <div>
+      <div class="chart-buttons">
 
-        <div class="label">
-          Wariant obliczenia
-        </div>
+        <button
+          id="chart6h"
+          onclick="setChartRange(6)"
+        >
+          6 h
+        </button>
 
-        <select id="scenario">
-
-          <option value="median">
-            Mediana — typowy wariant
-          </option>
-
-          <option value="p75">
-            P75 — większy zapas
-          </option>
-
-          <option value="p90">
-            P90 — największy zapas
-          </option>
-
-        </select>
-
-        <div class="field-description">
-          Wybierz, jak duży zapas czasu chcesz uwzględnić.
-        </div>
+        <button
+          id="chart24h"
+          onclick="setChartRange(24)"
+        >
+          24 h
+        </button>
 
       </div>
-
 
     </div>
 
 
-    <div class="result">
+    <div class="chart-wrap">
+
+      <canvas
+        id="queueChart"
+      ></canvas>
+
+    </div>
 
 
-      <div class="result-block">
+    <div class="chart-legend">
 
-        <div class="small">
-          Docelowe wywołanie:
-        </div>
+      <div class="legend-item">
 
-        <strong id="targetDisplay">
-          —
-        </strong>
+        <div class="legend-line"></div>
 
-        <div class="result-description">
-          Godzina, o której chcesz, aby Twoja kolej została wywołana.
-        </div>
-
-      </div>
-
-
-      <div class="result-block">
-
-        <div class="small">
-          Orientacyjny moment zapisania się:
-        </div>
-
-        <strong id="registrationDisplay">
-          —
-        </strong>
-
-        <div class="result-description">
-          Orientacyjny moment rozpoczęcia oczekiwania,
-          wyliczony na podstawie wybranego wariantu czasu oczekiwania.
-        </div>
+        <span>
+          Oczekujące samochody
+        </span>
 
       </div>
 
+    </div>
 
-      <div class="result-block">
+
+    <div
+      id="chartStats"
+      class="chart-stats"
+    ></div>
+
+  </div>
+
+
+
+  <!-- =========================================================
+       STATYSTYKI CZASU OCZEKIWANIA
+       ========================================================= -->
+
+  <div class="section">
+
+    <h2>
+      Statystyka rzeczywistego czasu oczekiwania
+    </h2>
+
+    <div class="chart-description">
+      Wartości są liczone na podstawie
+      samochodów, dla których system pozwolił
+      odtworzyć moment rejestracji oraz moment
+      wywołania.
+    </div>
+
+
+    <div class="stats-grid">
+
+      <div class="stat-box">
 
         <div
-          class="small"
-          id="calculationInfo"
+          id="p25Hours"
+          class="stat-value blue"
         >
           —
         </div>
 
+        <div class="stat-title">
+          P25
+        </div>
+
+        <div class="stat-description">
+          25% samochodów czekało krócej,
+          a 75% dłużej. To optymistyczny
+          punkt odniesienia.
+        </div>
+
+      </div>
+
+
+      <div class="stat-box">
+
+        <div
+          id="medianHours"
+          class="stat-value green"
+        >
+          —
+        </div>
+
+        <div class="stat-title">
+          Mediana
+        </div>
+
+        <div class="stat-description">
+          Typowy czas oczekiwania.
+          Połowa obserwowanych samochodów
+          czekała krócej, a połowa dłużej.
+        </div>
+
+      </div>
+
+
+      <div class="stat-box">
+
+        <div
+          id="p75Hours"
+          class="stat-value orange"
+        >
+          —
+        </div>
+
+        <div class="stat-title">
+          P75
+        </div>
+
+        <div class="stat-description">
+          75% samochodów zostało obsłużonych
+          w czasie krótszym lub równym tej
+          wartości.
+        </div>
+
+      </div>
+
+
+      <div class="stat-box">
+
+        <div
+          id="p90Hours"
+          class="stat-value red"
+        >
+          —
+        </div>
+
+        <div class="stat-title">
+          P90
+        </div>
+
+        <div class="stat-description">
+          Ostrożniejszy wariant.
+          Około 90% obserwowanych przypadków
+          mieściło się poniżej tego czasu.
+        </div>
+
       </div>
 
     </div>
 
 
-    <div class="explanation">
+    <div
+      id="completedEvents"
+      style="
+        margin-top:14px;
+        color:#6b7280;
+        font-size:13px;
+      "
+    >
+      Liczba obserwowanych zakończonych
+      przypadków: —
+    </div>
 
-      <b>Przykład:</b><br>
+  </div>
 
-      Jeżeli chcesz zostać wywołany w niedzielę o 09:30,
-      a model pokazuje medianę oczekiwania wynoszącą około 21 godzin,
-      kalkulator cofnie się o około 21 godzin i poda orientacyjny
-      moment zapisania się.
 
-      <br><br>
 
-      To jest <b>punkt wyjścia do decyzji</b>, a nie gwarantowana
-      godzina wywołania.
+  <!-- =========================================================
+       KALKULATOR
+       ========================================================= -->
+
+  <div class="section">
+
+    <h2>
+      Kiedy zapisać się do kolejki?
+    </h2>
+
+    <div class="chart-description">
+      Wpisz godzinę, o której chcesz, aby
+      Twoja kolejka została osiągnięta.
+      Kalkulator odejmie przewidywany czas
+      oczekiwania od tej godziny.
+    </div>
+
+
+    <div class="calculator">
+
+      <div class="input-group">
+
+        <label for="targetDate">
+          Docelowa data
+        </label>
+
+        <div class="input-description">
+          Dzień, w którym chcesz być już
+          przy wywołaniu kolejki.
+        </div>
+
+        <input
+          id="targetDate"
+          type="date"
+        >
+
+      </div>
+
+
+      <div class="input-group">
+
+        <label for="targetTime">
+          Docelowa godzina
+        </label>
+
+        <div class="input-description">
+          Godzina, o której zakładasz
+          osiągnięcie Twojej pozycji.
+        </div>
+
+        <input
+          id="targetTime"
+          type="time"
+          value="09:30"
+        >
+
+      </div>
+
+
+      <div class="input-group">
+
+        <label for="waitScenario">
+          Wariant obliczenia
+        </label>
+
+        <div class="input-description">
+          Możesz użyć typowej wartości
+          albo bardziej ostrożnego scenariusza.
+        </div>
+
+        <select id="waitScenario">
+
+          <option value="median">
+            Mediana — typowy przypadek
+          </option>
+
+          <option value="p75">
+            P75 — ostrożniej
+          </option>
+
+          <option value="p90">
+            P90 — bardzo ostrożnie
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="input-group">
+
+        <label>
+          Strefa czasowa
+        </label>
+
+        <div class="input-description">
+          Kalkulator korzysta z lokalnego
+          czasu urządzenia.
+        </div>
+
+        <input
+          id="timezoneInfo"
+          type="text"
+          readonly
+          value=""
+        >
+
+      </div>
+
+
+      <div
+        class="calculator-result"
+      >
+
+        <div class="result-title">
+          Zalecany moment rejestracji
+        </div>
+
+        <div
+          id="registrationResult"
+          class="result-value"
+        >
+          —
+        </div>
+
+        <div
+          id="registrationDescription"
+          class="result-description"
+        >
+          Wybierz datę i godzinę docelową.
+        </div>
+
+      </div>
 
     </div>
 
   </div>
 
 
-  <!-- ==========================================================
-       DYNAMIKA
-       ========================================================== -->
+
+  <!-- =========================================================
+       DYNAMIKA KOLEJKI
+       ========================================================= -->
 
   <div class="section">
 
-    <h2>📊 Dynamika kolejki</h2>
+    <h2>
+      Dynamika kolejki
+    </h2>
+
+    <div class="chart-description">
+      Te wartości pokazują, jak zmieniała się
+      liczba samochodów widocznych w kolejnych
+      odczytach. Nie należy ich jeszcze
+      utożsamiać bezpośrednio z rzeczywistą
+      przepustowością przejścia.
+    </div>
 
 
-    <div class="grid">
+    <div class="dynamics-grid">
 
+      <div class="dynamic-box">
 
-      <div class="card">
-
-        <div class="label">
+        <div class="dynamic-title">
           Zmiana 30 min
         </div>
 
-        <div class="value" id="change30">
+        <div
+          id="change30m"
+          class="dynamic-value"
+        >
           —
         </div>
 
-        <div class="unit">
-          aut.
-        </div>
-
-        <div class="card-description">
-          Różnica w liczbie obserwowanych samochodów między
-          obecnym odczytem a odczytem sprzed około 30 minut.
+        <div class="dynamic-description">
+          Różnica liczby oczekujących między
+          aktualnym odczytem a odczytem
+          sprzed około 30 minut.
         </div>
 
       </div>
 
 
-      <div class="card">
+      <div class="dynamic-box">
 
-        <div class="label">
+        <div class="dynamic-title">
           Zmiana 1 h
         </div>
 
-        <div class="value" id="change1">
+        <div
+          id="change1h"
+          class="dynamic-value"
+        >
           —
         </div>
 
-        <div class="unit">
-          aut.
-        </div>
-
-        <div class="card-description">
-          Różnica w liczbie obserwowanych samochodów między
-          obecnym odczytem a odczytem sprzed około godziny.
+        <div class="dynamic-description">
+          Pokazuje kierunek zmian kolejki
+          w przybliżeniu w ciągu ostatniej
+          godziny.
         </div>
 
       </div>
 
 
-      <div class="card">
+      <div class="dynamic-box">
 
-        <div class="label">
+        <div class="dynamic-title">
           Tempo netto 30 min
         </div>
 
-        <div class="value" id="rate30">
+        <div
+          id="rate30m"
+          class="dynamic-value"
+        >
           —
         </div>
 
-        <div class="unit">
-          aut./h
-        </div>
-
-        <div class="card-description">
-          Jak szybko zmieniała się obserwowana liczba samochodów
-          w ostatnich 30 minutach, przeliczona na godzinę.
+        <div class="dynamic-description">
+          Przybliżona zmiana liczby samochodów
+          w przeliczeniu na godzinę.
         </div>
 
       </div>
 
 
-      <div class="card">
+      <div class="dynamic-box">
 
-        <div class="label">
+        <div class="dynamic-title">
           Tempo netto 1 h
         </div>
 
-        <div class="value" id="rate1">
+        <div
+          id="rate1h"
+          class="dynamic-value"
+        >
           —
         </div>
 
-        <div class="unit">
-          aut./h
-        </div>
-
-        <div class="card-description">
-          Jak szybko zmieniała się obserwowana liczba samochodów
-          w ostatniej godzinie, przeliczona na godzinę.
+        <div class="dynamic-description">
+          Dłuższy, bardziej stabilny punkt
+          odniesienia dla kierunku zmian.
         </div>
 
       </div>
 
-
-    </div>
-
-
-    <div class="explanation">
-
-      <b>Jak to interpretować?</b><br>
-
-      Wartość ujemna oznacza, że obserwowana liczba samochodów
-      maleje. Wartość dodatnia oznacza, że rośnie.
-
-      <br><br>
-
-      Przykład: <b>−29 aut./h</b> oznacza, że w obserwowanym
-      okresie liczba samochodów zmniejszała się średnio o około
-      29 samochodów na godzinę.
-
-      <br><br>
-
-      <b>Uwaga:</b> jest to tempo netto zmiany obserwowanej liczby
-      samochodów, a nie bezpośrednia liczba samochodów odprawianych
-      na granicy w ciągu godziny.
-
     </div>
 
   </div>
 
 
-  <!-- ==========================================================
-       INFORMACJE
-       ========================================================== -->
+
+  <!-- =========================================================
+       WYJAŚNIENIE MODELU
+       ========================================================= -->
 
   <div class="section">
 
-    <h2>ℹ️ Informacje</h2>
+    <h2>
+      Jak czytać wynik?
+    </h2>
 
 
-    <div class="small">
+    <div class="info-box">
 
-      <p>
-        <b>Ostatnia aktualizacja danych:</b><br>
-        <span id="updatedAt">—</span>
-      </p>
+      <strong>Mediana</strong> jest obecnie
+      najważniejszą wartością do planowania.
+      Jeżeli model pokazuje np. 21 godzin,
+      oznacza to, że historycznie typowy
+      samochód potrzebował około 21 godzin
+      od rejestracji do wywołania.
 
-
-      <p>
-        <b>Strefa czasowa urządzenia:</b><br>
-        <span id="timezone">—</span>
-      </p>
+    </div>
 
 
-      <p>
-        <b>Automatyczne odświeżanie:</b><br>
-        Strona pobiera nowe dane co 5 minut.
-      </p>
+    <div class="info-box">
+
+      <strong>P75 i P90</strong> pozwalają
+      uwzględnić ryzyko wolniejszego przejazdu
+      kolejki. Jeżeli zależy Ci na większym
+      bezpieczeństwie czasowym, lepiej patrzeć
+      na P75 lub P90 niż wyłącznie na medianę.
+
+    </div>
+
+
+    <div class="info-box">
+
+      <strong>Model jest uczony na bieżąco.</strong>
+      Na początku dane są jeszcze ograniczone,
+      dlatego wynik może się zmieniać bardziej
+      niż później. Wraz z kolejnymi odczytami
+      model będzie miał coraz więcej informacji
+      o rzeczywistym czasie oczekiwania.
+
+    </div>
+
+
+    <div class="info-box">
+
+      <strong>Ważne:</strong>
+      liczba „oczekujących” pochodzi z bieżącego
+      widoku monitoringu API. Nie należy jej
+      automatycznie traktować jako pełnej,
+      oficjalnej liczby wszystkich samochodów
+      znajdujących się w całej kolejce.
 
     </div>
 
   </div>
 
-
-  <div
-    id="status"
-    class="status"
-  >
-    Ładowanie danych...
-  </div>
 
 
   <div class="footer">
 
-    Projekt monitorowania kolejki Brest → Terespol.
+    Brest Queue Monitor · automatyczne odświeżanie danych
 
-    <br>
-
-    Dane mają charakter orientacyjny i nie gwarantują dokładnego
-    czasu wywołania.
+    <span id="refreshInfo"></span>
 
   </div>
 
 </div>
 
 
+
 <script>
 
-/* ==============================================================
-   SUPABASE
-   ============================================================== */
+/* ================================================================
+   KONFIGURACJA SUPABASE
+   ================================================================ */
 
 const SUPABASE_URL =
   "https://fxunctikzhxvtdddorkp.supabase.co";
@@ -976,12 +1071,130 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   "sb_publishable_R3009GBuhlJ5_xD_0LOY0A_gDgsEwEK";
 
+const CHECKPOINT_ID =
+  "a9173a85-3fc0-424c-84f0-defa632481e4";
 
-/* ==============================================================
-   POBIERANIE Z SUPABASE
-   ============================================================== */
 
-async function supabaseFetch(path) {
+/* ================================================================
+   ZMIENNE
+   ================================================================ */
+
+let chartRangeHours = 24;
+
+let chartData = [];
+
+
+/* ================================================================
+   POMOCNICZE
+   ================================================================ */
+
+function $(id) {
+  return document.getElementById(id);
+}
+
+
+function formatDateTime(date) {
+
+  if (!date) {
+    return "—";
+  }
+
+  return date.toLocaleString(
+    navigator.language || "pl-PL",
+    {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    }
+  );
+
+}
+
+
+function formatHours(value) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    isNaN(value)
+  ) {
+    return "—";
+  }
+
+  return Number(value).toFixed(2) + " h";
+
+}
+
+
+function formatNumber(value) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    isNaN(value)
+  ) {
+    return "—";
+  }
+
+  return Number(value).toLocaleString(
+    "pl-PL"
+  );
+
+}
+
+
+function formatSigned(value) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    isNaN(value)
+  ) {
+    return "—";
+  }
+
+  const number =
+    Number(value);
+
+  return (
+    number > 0 ? "+" : ""
+  ) +
+  number.toFixed(0);
+
+}
+
+
+function formatRate(value) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    isNaN(value)
+  ) {
+    return "—";
+  }
+
+  const number =
+    Number(value);
+
+  return (
+    number > 0 ? "+" : ""
+  ) +
+  number.toFixed(1) +
+  " / h";
+
+}
+
+
+/* ================================================================
+   SUPABASE FETCH
+   ================================================================ */
+
+async function supabaseFetch(
+  path
+) {
 
   const response =
     await fetch(
@@ -1002,491 +1215,207 @@ async function supabaseFetch(path) {
       await response.text();
 
     throw new Error(
-      path +
-      " HTTP " +
       response.status +
       ": " +
       text
     );
+
   }
 
 
   return response.json();
+
 }
 
 
-/* ==============================================================
-   FORMAT DATY
-   ============================================================== */
-
-function formatDateTime(value) {
-
-  if (!value) {
-    return "—";
-  }
-
-
-  const date =
-    new Date(value);
-
-
-  if (
-    isNaN(
-      date.getTime()
-    )
-  ) {
-    return "—";
-  }
-
-
-  return new Intl.DateTimeFormat(
-    navigator.language || "pl-PL",
-    {
-      dateStyle: "medium",
-      timeStyle: "short"
-    }
-  ).format(date);
-}
-
-
-/* ==============================================================
-   LICZBA
-   ============================================================== */
-
-function number(value, decimals = 0) {
-
-  if (
-    value === null ||
-    value === undefined ||
-    isNaN(Number(value))
-  ) {
-    return "—";
-  }
-
-
-  return Number(value).toFixed(
-    decimals
-  );
-}
-
-
-/* ==============================================================
-   ELEMENTY
-   ============================================================== */
-
-const waitingCars =
-  document.getElementById(
-    "waitingCars"
-  );
-
-const calledCars =
-  document.getElementById(
-    "calledCars"
-  );
-
-const monitoringCount =
-  document.getElementById(
-    "monitoringCount"
-  );
-
-const change1h =
-  document.getElementById(
-    "change1h"
-  );
-
-const p25 =
-  document.getElementById(
-    "p25"
-  );
-
-const median =
-  document.getElementById(
-    "median"
-  );
-
-const p75 =
-  document.getElementById(
-    "p75"
-  );
-
-const p90 =
-  document.getElementById(
-    "p90"
-  );
-
-const modelStatus =
-  document.getElementById(
-    "modelStatus"
-  );
-
-const change30 =
-  document.getElementById(
-    "change30"
-  );
-
-const change1 =
-  document.getElementById(
-    "change1"
-  );
-
-const rate30 =
-  document.getElementById(
-    "rate30"
-  );
-
-const rate1 =
-  document.getElementById(
-    "rate1"
-  );
-
-const updatedAt =
-  document.getElementById(
-    "updatedAt"
-  );
-
-const timezone =
-  document.getElementById(
-    "timezone"
-  );
-
-const status =
-  document.getElementById(
-    "status"
-  );
-
-const targetDate =
-  document.getElementById(
-    "targetDate"
-  );
-
-const scenario =
-  document.getElementById(
-    "scenario"
-  );
-
-const targetDisplay =
-  document.getElementById(
-    "targetDisplay"
-  );
-
-const registrationDisplay =
-  document.getElementById(
-    "registrationDisplay"
-  );
-
-const calculationInfo =
-  document.getElementById(
-    "calculationInfo"
-  );
-
-
-/* ==============================================================
-   STREFA CZASOWA
-   ============================================================== */
-
-timezone.textContent =
-  Intl.DateTimeFormat()
-    .resolvedOptions()
-    .timeZone;
-
-
-/* ==============================================================
-   MODEL
-   ============================================================== */
-
-let model = null;
-
-
-/* ==============================================================
-   WYKRES
-   ============================================================== */
-
-let chartData = [];
-
-let chartRangeHours = 6;
-
-
-/* ==============================================================
-   ŁADOWANIE MODELU
-   ============================================================== */
+/* ================================================================
+   POBRANIE MODELU
+   ================================================================ */
 
 async function loadModel() {
 
-  try {
-
-    status.className =
-      "status";
-
-    status.textContent =
-      "Pobieranie aktualnych danych...";
-
-
-    const rows =
-      await supabaseFetch(
-        "queue_model_v2?select=*&order=latest_at.desc&limit=1"
-      );
+  const rows =
+    await supabaseFetch(
+      "queue_model_v2?select=*&checkpoint_id=eq." +
+      CHECKPOINT_ID +
+      "&limit=1"
+    );
 
 
-    if (
-      !rows ||
-      rows.length === 0
-    ) {
+  if (
+    !rows ||
+    rows.length === 0
+  ) {
 
-      throw new Error(
-        "Brak danych w queue_model_v2"
-      );
-    }
-
-
-    model =
-      rows[0];
-
-
-    waitingCars.textContent =
-      number(
-        model.waiting_cars
-      );
-
-
-    calledCars.textContent =
-      number(
-        model.called_cars
-      );
-
-
-    monitoringCount.textContent =
-      number(
-        model.monitoring_count
-      );
-
-
-    p25.textContent =
-      number(
-        model.p25_hours,
-        2
-      );
-
-
-    median.textContent =
-      number(
-        model.median_hours,
-        2
-      );
-
-
-    p75.textContent =
-      number(
-        model.p75_hours,
-        2
-      );
-
-
-    p90.textContent =
-      number(
-        model.p90_hours,
-        2
-      );
-
-
-    change30.textContent =
-      number(
-        model.change_30min
-      );
-
-
-    change1.textContent =
-      number(
-        model.change_1h
-      );
-
-
-    change1h.textContent =
-      number(
-        model.change_1h
-      );
-
-
-    rate30.textContent =
-      number(
-        model.net_queue_rate_30m,
-        2
-      );
-
-
-    rate1.textContent =
-      number(
-        model.net_queue_rate_1h,
-        2
-      );
-
-
-    if (
-      model.model_status
-    ) {
-
-      modelStatus.textContent =
-        model.model_status;
-
-    } else {
-
-      modelStatus.textContent =
-        "Model działa";
-
-    }
-
-
-    updatedAt.textContent =
-      formatDateTime(
-        model.latest_at
-      );
-
-
-    if (
-      model.has_6h_queue_history === false
-    ) {
-
-      status.className =
-        "status warning";
-
-      status.textContent =
-        "Model wstępny — zbieramy jeszcze historię kolejki. " +
-        "Czas oczekiwania jest obecnie liczony głównie " +
-        "na podstawie rzeczywistych zakończonych przejazdów.";
-
-    } else {
-
-      status.className =
-        "status ok";
-
-      status.textContent =
-        "Model działa na podstawie aktualnej historii danych.";
-
-    }
-
-
-    calculateTarget();
-
-  } catch (error) {
-
-    console.error(error);
-
-
-    status.className =
-      "status error";
-
-
-    status.textContent =
-      "Błąd pobierania modelu: " +
-      error.message;
-
-
-    modelStatus.textContent =
-      "Błąd";
+    throw new Error(
+      "Brak danych queue_model_v2"
+    );
 
   }
+
+
+  const model =
+    rows[0];
+
+
+  $("waitingCars").textContent =
+    formatNumber(
+      model.waiting_cars
+    );
+
+
+  $("calledCars").textContent =
+    formatNumber(
+      model.called_cars
+    );
+
+
+  $("monitoringCount").textContent =
+    formatNumber(
+      model.monitoring_count
+    );
+
+
+  $("latestUpdate").textContent =
+    formatDateTime(
+      new Date(
+        model.latest_at
+      )
+    );
+
+
+  $("p25Hours").textContent =
+    formatHours(
+      model.p25_hours
+    );
+
+
+  $("medianHours").textContent =
+    formatHours(
+      model.median_hours
+    );
+
+
+  $("p75Hours").textContent =
+    formatHours(
+      model.p75_hours
+    );
+
+
+  $("p90Hours").textContent =
+    formatHours(
+      model.p90_hours
+    );
+
+
+  $("completedEvents").textContent =
+    "Liczba obserwowanych zakończonych przypadków: " +
+    formatNumber(
+      model.completed_events
+    );
+
+
+  $("change30m").textContent =
+    formatSigned(
+      model.change_30min
+    );
+
+
+  $("change1h").textContent =
+    formatSigned(
+      model.change_1h
+    );
+
+
+  $("rate30m").textContent =
+    formatRate(
+      model.net_queue_rate_30m
+    );
+
+
+  $("rate1h").textContent =
+    formatRate(
+      model.net_queue_rate_1h
+    );
+
+
+  let statusText =
+    model.model_status ||
+    "Model działa.";
+
+  let extraText = "";
+
+
+  if (
+    model.has_6h_queue_history === false
+  ) {
+
+    extraText +=
+      " Historia dynamiki 6 h nie jest jeszcze pełna.";
+
+  }
+
+
+  if (
+    model.has_large_wait_sample === false
+  ) {
+
+    extraText +=
+      " Próba czasów oczekiwania jest jeszcze niewielka.";
+
+  }
+
+
+  $("modelStatus").innerHTML =
+    "<strong>Status modelu:</strong> " +
+    statusText +
+    extraText;
+
+
+  calculateRegistration();
 
 }
 
 
-/* ==============================================================
+/* ================================================================
    HISTORIA WYKRESU
-   ============================================================== */
+   ================================================================ */
 
 async function loadChartData() {
 
-  try {
-
-    const rows =
-      await supabaseFetch(
-        "queue_snapshots?select=captured_at,waiting_cars,called_cars,monitoring_count&order=captured_at.asc&limit=3000"
-      );
-
-
-    if (
-      !rows ||
-      rows.length === 0
-    ) {
-
-      chartData = [];
-
-      drawChart();
-
-      return;
-    }
-
-
-    chartData =
-      rows.map(
-        row => ({
-
-          time:
-            new Date(
-              row.captured_at
-            ),
-
-          waiting:
-            Number(
-              row.waiting_cars
-            ),
-
-          called:
-            Number(
-              row.called_cars
-            ),
-
-          monitoring:
-            Number(
-              row.monitoring_count
-            )
-
-        })
-      );
-
-
-    drawChart();
-
-  } catch (error) {
-
-    console.error(
-      "Błąd wykresu:",
-      error
+  const rows =
+    await supabaseFetch(
+      "queue_snapshots?select=captured_at,waiting_cars,called_cars,monitoring_count&checkpoint_id=eq." +
+      CHECKPOINT_ID +
+      "&order=captured_at.asc&limit=3000"
     );
 
 
-    chartData = [];
+  chartData =
+    rows.map(
+      row => ({
 
-    drawChart();
+        time:
+          new Date(
+            row.captured_at
+          ),
 
-  }
+        waiting:
+          Number(
+            row.waiting_cars
+          ),
 
-}
+        called:
+          Number(
+            row.called_cars
+          ),
 
+        monitoring:
+          Number(
+            row.monitoring_count
+          )
 
-/* ==============================================================
-   ZAKRES WYKRESU
-   ============================================================== */
-
-function setChartRange(hours) {
-
-  chartRangeHours =
-    hours;
-
-
-  document
-    .getElementById("btn6h")
-    .classList
-    .toggle(
-      "active",
-      hours === 6
-    );
-
-
-  document
-    .getElementById("btn24h")
-    .classList
-    .toggle(
-      "active",
-      hours === 24
+      })
     );
 
 
@@ -1495,22 +1424,17 @@ function setChartRange(hours) {
 }
 
 
-/* ==============================================================
+/* ================================================================
    RYSOWANIE WYKRESU
-   ============================================================== */
+   ================================================================ */
 
 function drawChart() {
 
   const canvas =
-    document.getElementById(
-      "queueChart"
-    );
-
+    $("queueChart");
 
   const ctx =
-    canvas.getContext(
-      "2d"
-    );
+    canvas.getContext("2d");
 
 
   const rect =
@@ -1536,13 +1460,11 @@ function drawChart() {
 
 
   const dpr =
-    window.devicePixelRatio ||
-    1;
+    window.devicePixelRatio || 1;
 
 
   canvas.width =
     width * dpr;
-
 
   canvas.height =
     height * dpr;
@@ -1583,19 +1505,16 @@ function drawChart() {
     ctx.textBaseline =
       "middle";
 
-
     ctx.fillText(
       "Brak historii — dane dopiero się zbierają",
       width / 2,
       height / 2
     );
 
-
-    updateChartStats(
-      []
-    );
+    updateChartStats([]);
 
     return;
+
   }
 
 
@@ -1637,33 +1556,23 @@ function drawChart() {
     ctx.textBaseline =
       "middle";
 
-
     ctx.fillText(
       "Brak danych dla wybranego zakresu",
       width / 2,
       height / 2
     );
 
-
-    updateChartStats(
-      []
-    );
+    updateChartStats([]);
 
     return;
+
   }
 
 
-  const marginLeft =
-    55;
-
-  const marginRight =
-    18;
-
-  const marginTop =
-    20;
-
-  const marginBottom =
-    45;
+  const marginLeft = 55;
+  const marginRight = 18;
+  const marginTop = 20;
+  const marginBottom = 45;
 
 
   const chartWidth =
@@ -1686,15 +1595,11 @@ function drawChart() {
 
 
   let minValue =
-    Math.min(
-      ...values
-    );
+    Math.min(...values);
 
 
   let maxValue =
-    Math.max(
-      ...values
-    );
+    Math.max(...values);
 
 
   if (
@@ -1702,7 +1607,6 @@ function drawChart() {
   ) {
 
     minValue -= 10;
-
     maxValue += 10;
 
   }
@@ -1711,10 +1615,8 @@ function drawChart() {
   const padding =
     Math.max(
       5,
-      (
-        maxValue -
-        minValue
-      ) * 0.10
+      (maxValue - minValue) *
+      0.10
     );
 
 
@@ -1725,8 +1627,7 @@ function drawChart() {
     );
 
 
-  maxValue =
-    maxValue + padding;
+  maxValue += padding;
 
 
   function xFor(time) {
@@ -1734,10 +1635,7 @@ function drawChart() {
     return (
       marginLeft +
       (
-        (
-          time -
-          startTime
-        ) /
+        (time - startTime) /
         (
           latestTime -
           startTime ||
@@ -1756,10 +1654,7 @@ function drawChart() {
       marginTop +
       chartHeight -
       (
-        (
-          value -
-          minValue
-        ) /
+        (value - minValue) /
         (
           maxValue -
           minValue ||
@@ -1772,17 +1667,15 @@ function drawChart() {
   }
 
 
-  /* SIATKA */
+  /* GRID */
 
   ctx.strokeStyle =
     "#e5e7eb";
 
-  ctx.lineWidth =
-    1;
+  ctx.lineWidth = 1;
 
 
-  const gridLines =
-    5;
+  const gridLines = 5;
 
 
   for (
@@ -1794,8 +1687,7 @@ function drawChart() {
     const y =
       marginTop +
       (
-        i /
-        gridLines
+        i / gridLines
       ) *
       chartHeight;
 
@@ -1819,8 +1711,7 @@ function drawChart() {
     const value =
       maxValue -
       (
-        i /
-        gridLines
+        i / gridLines
       ) *
       (
         maxValue -
@@ -1842,9 +1733,7 @@ function drawChart() {
 
 
     ctx.fillText(
-      Math.round(
-        value
-      ),
+      Math.round(value),
       marginLeft - 8,
       y
     );
@@ -1899,9 +1788,7 @@ function drawChart() {
 
 
     const date =
-      new Date(
-        time
-      );
+      new Date(time);
 
 
     const label =
@@ -1971,8 +1858,7 @@ function drawChart() {
   ctx.strokeStyle =
     "#2563eb";
 
-  ctx.lineWidth =
-    3;
+  ctx.lineWidth = 3;
 
   ctx.lineJoin =
     "round";
@@ -2082,6 +1968,33 @@ function drawChart() {
   );
 
 
+  /*
+   * Zapamiętujemy punkty,
+   * żeby tooltip wiedział,
+   * gdzie znajdują się dane.
+   */
+
+  canvas._chartPoints =
+    visible.map(
+      item => ({
+
+        x:
+          xFor(
+            item.time.getTime()
+          ),
+
+        y:
+          yFor(
+            item.waiting
+          ),
+
+        data:
+          item
+
+      })
+    );
+
+
   updateChartStats(
     visible
   );
@@ -2089,26 +2002,16 @@ function drawChart() {
 }
 
 
-/* ==============================================================
-   STATYSTYKI WYKRESU
-   ============================================================== */
+/* ================================================================
+   STATYSTYKI POD WYKRESEM
+   ================================================================ */
 
-function updateChartStats(data) {
+function updateChartStats(
+  data
+) {
 
-  const start =
-    document.getElementById(
-      "chartStart"
-    );
-
-  const current =
-    document.getElementById(
-      "chartCurrent"
-    );
-
-  const change =
-    document.getElementById(
-      "chartChange"
-    );
+  const el =
+    $("chartStats");
 
 
   if (
@@ -2116,156 +2019,611 @@ function updateChartStats(data) {
     data.length === 0
   ) {
 
-    start.textContent =
-      "—";
-
-    current.textContent =
-      "—";
-
-    change.textContent =
-      "—";
+    el.textContent =
+      "";
 
     return;
+
   }
+
+
+  const values =
+    data.map(
+      item =>
+        item.waiting
+    );
 
 
   const first =
-    data[0];
+    values[0];
 
 
   const last =
-    data[
-      data.length - 1
+    values[
+      values.length - 1
     ];
 
 
-  start.textContent =
-    String(
-      first.waiting
-    );
+  const min =
+    Math.min(...values);
 
 
-  current.textContent =
-    String(
-      last.waiting
-    );
+  const max =
+    Math.max(...values);
 
 
-  const delta =
-    last.waiting -
-    first.waiting;
+  el.innerHTML =
 
+    "Pierwszy odczyt: <strong>" +
+    formatNumber(first) +
+    "</strong>" +
 
-  if (
-    delta > 0
-  ) {
+    " · Ostatni: <strong>" +
+    formatNumber(last) +
+    "</strong>" +
 
-    change.textContent =
-      "+" + delta;
+    " · Minimum: <strong>" +
+    formatNumber(min) +
+    "</strong>" +
 
-  } else {
-
-    change.textContent =
-      String(delta);
-
-  }
+    " · Maksimum: <strong>" +
+    formatNumber(max) +
+    "</strong>";
 
 }
 
 
-/* ==============================================================
-   KALKULATOR
-   ============================================================== */
+/* ================================================================
+   ZMIANA ZAKRESU WYKRESU
+   ================================================================ */
 
-function calculateTarget() {
+function setChartRange(
+  hours
+) {
 
-  if (!model) {
-    return;
+  chartRangeHours =
+    hours;
+
+
+  $("chart6h")
+    .classList.toggle(
+      "active",
+      hours === 6
+    );
+
+
+  $("chart24h")
+    .classList.toggle(
+      "active",
+      hours === 24
+    );
+
+
+  drawChart();
+
+}
+
+
+/* ================================================================
+   TOOLTIP
+   ================================================================ */
+
+let chartTooltip =
+  document.getElementById(
+    "chartTooltip"
+  );
+
+
+if (!chartTooltip) {
+
+  chartTooltip =
+    document.createElement(
+      "div"
+    );
+
+
+  chartTooltip.id =
+    "chartTooltip";
+
+
+  chartTooltip.style.position =
+    "fixed";
+
+
+  chartTooltip.style.display =
+    "none";
+
+
+  chartTooltip.style.background =
+    "#111827";
+
+
+  chartTooltip.style.color =
+    "white";
+
+
+  chartTooltip.style.padding =
+    "10px 12px";
+
+
+  chartTooltip.style.borderRadius =
+    "9px";
+
+
+  chartTooltip.style.fontSize =
+    "13px";
+
+
+  chartTooltip.style.lineHeight =
+    "1.5";
+
+
+  chartTooltip.style.pointerEvents =
+    "none";
+
+
+  chartTooltip.style.zIndex =
+    "9999";
+
+
+  chartTooltip.style.boxShadow =
+    "0 4px 15px rgba(0,0,0,0.20)";
+
+
+  document.body.appendChild(
+    chartTooltip
+  );
+
+}
+
+
+/* ================================================================
+   NAJBLIŻSZY PUNKT
+   ================================================================ */
+
+function findChartPoint(
+  clientX,
+  clientY
+) {
+
+  const canvas =
+    $("queueChart");
+
+
+  if (
+    !canvas._chartPoints ||
+    canvas._chartPoints.length === 0
+  ) {
+
+    return null;
+
   }
 
 
-  const value =
-    targetDate.value;
+  const rect =
+    canvas.getBoundingClientRect();
 
 
-  if (!value) {
+  const x =
+    clientX -
+    rect.left;
 
-    targetDisplay.textContent =
-      "—";
 
-    registrationDisplay.textContent =
-      "—";
+  const y =
+    clientY -
+    rect.top;
 
-    calculationInfo.textContent =
-      "Wybierz datę i godzinę.";
+
+  let nearest = null;
+
+  let distance =
+    Infinity;
+
+
+  canvas._chartPoints.forEach(
+    point => {
+
+      const dx =
+        point.x - x;
+
+
+      const dy =
+        point.y - y;
+
+
+      const d =
+        Math.sqrt(
+          dx * dx +
+          dy * dy
+        );
+
+
+      if (
+        d < distance
+      ) {
+
+        distance = d;
+
+        nearest = point;
+
+      }
+
+    }
+  );
+
+
+  if (
+    distance > 30
+  ) {
+
+    return null;
+
+  }
+
+
+  return nearest;
+
+}
+
+
+/* ================================================================
+   POKAŻ TOOLTIP
+   ================================================================ */
+
+function showChartTooltip(
+  point,
+  clientX,
+  clientY
+) {
+
+  if (!point) {
+
+    chartTooltip.style.display =
+      "none";
 
     return;
+
+  }
+
+
+  const data =
+    point.data;
+
+
+  const date =
+    data.time.toLocaleDateString(
+      navigator.language ||
+      "pl-PL",
+      {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      }
+    );
+
+
+  const time =
+    data.time.toLocaleTimeString(
+      navigator.language ||
+      "pl-PL",
+      {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      }
+    );
+
+
+  chartTooltip.innerHTML =
+
+    "<b>" +
+    date +
+    " • " +
+    time +
+    "</b>" +
+
+    "<br>" +
+
+    "🚗 Oczekujące: <b>" +
+    formatNumber(
+      data.waiting
+    ) +
+    "</b>" +
+
+    "<br>" +
+
+    "📣 Wywołane: <b>" +
+    formatNumber(
+      data.called
+    ) +
+    "</b>" +
+
+    "<br>" +
+
+    "📡 Monitoring: <b>" +
+    formatNumber(
+      data.monitoring
+    ) +
+    "</b>";
+
+
+  chartTooltip.style.display =
+    "block";
+
+
+  let left =
+    clientX + 14;
+
+
+  let top =
+    clientY + 14;
+
+
+  const tooltipWidth =
+    chartTooltip.offsetWidth;
+
+
+  const tooltipHeight =
+    chartTooltip.offsetHeight;
+
+
+  if (
+    left +
+    tooltipWidth >
+    window.innerWidth - 10
+  ) {
+
+    left =
+      clientX -
+      tooltipWidth -
+      14;
+
+  }
+
+
+  if (
+    top +
+    tooltipHeight >
+    window.innerHeight - 10
+  ) {
+
+    top =
+      clientY -
+      tooltipHeight -
+      14;
+
+  }
+
+
+  chartTooltip.style.left =
+    Math.max(
+      10,
+      left
+    ) +
+    "px";
+
+
+  chartTooltip.style.top =
+    Math.max(
+      10,
+      top
+    ) +
+    "px";
+
+}
+
+
+/* ================================================================
+   HOVER — KOMPUTER
+   ================================================================ */
+
+$("queueChart")
+  .addEventListener(
+    "mousemove",
+    function(event) {
+
+      const point =
+        findChartPoint(
+          event.clientX,
+          event.clientY
+        );
+
+
+      showChartTooltip(
+        point,
+        event.clientX,
+        event.clientY
+      );
+
+    }
+  );
+
+
+$("queueChart")
+  .addEventListener(
+    "mouseleave",
+    function() {
+
+      chartTooltip.style.display =
+        "none";
+
+    }
+  );
+
+
+/* ================================================================
+   DOTKNIĘCIE — TELEFON
+   ================================================================ */
+
+$("queueChart")
+  .addEventListener(
+    "touchstart",
+    function(event) {
+
+      if (
+        !event.touches ||
+        !event.touches[0]
+      ) {
+
+        return;
+
+      }
+
+
+      const touch =
+        event.touches[0];
+
+
+      const point =
+        findChartPoint(
+          touch.clientX,
+          touch.clientY
+        );
+
+
+      if (point) {
+
+        showChartTooltip(
+          point,
+          touch.clientX,
+          touch.clientY
+        );
+
+      }
+
+    },
+    {
+      passive: true
+    }
+  );
+
+
+$("queueChart")
+  .addEventListener(
+    "touchend",
+    function() {
+
+      setTimeout(
+        function() {
+
+          chartTooltip.style.display =
+            "none";
+
+        },
+        4000
+      );
+
+    }
+  );
+
+
+/* ================================================================
+   KALKULATOR
+   ================================================================ */
+
+function getSelectedWaitHours() {
+
+  const scenario =
+    $("waitScenario").value;
+
+
+  const median =
+    parseFloat(
+      $("medianHours").textContent
+    );
+
+
+  const p75 =
+    parseFloat(
+      $("p75Hours").textContent
+    );
+
+
+  const p90 =
+    parseFloat(
+      $("p90Hours").textContent
+    );
+
+
+  if (
+    scenario === "p75"
+  ) {
+
+    return p75;
+
+  }
+
+
+  if (
+    scenario === "p90"
+  ) {
+
+    return p90;
+
+  }
+
+
+  return median;
+
+}
+
+
+function calculateRegistration() {
+
+  const dateValue =
+    $("targetDate").value;
+
+
+  const timeValue =
+    $("targetTime").value;
+
+
+  if (
+    !dateValue ||
+    !timeValue
+  ) {
+
+    $("registrationResult")
+      .textContent =
+      "—";
+
+    $("registrationDescription")
+      .textContent =
+      "Wybierz datę i godzinę docelową.";
+
+    return;
+
+  }
+
+
+  const waitHours =
+    getSelectedWaitHours();
+
+
+  if (
+    isNaN(waitHours)
+  ) {
+
+    $("registrationResult")
+      .textContent =
+      "Brak danych";
+
+
+    $("registrationDescription")
+      .textContent =
+      "Model nie ma jeszcze wystarczającej liczby danych.";
+
+    return;
+
   }
 
 
   const target =
     new Date(
-      value
+      dateValue +
+      "T" +
+      timeValue
     );
-
-
-  if (
-    isNaN(
-      target.getTime()
-    )
-  ) {
-
-    calculationInfo.textContent =
-      "Nieprawidłowa data.";
-
-    return;
-  }
-
-
-  let waitHours =
-    Number(
-      model.median_hours
-    );
-
-
-  if (
-    scenario.value ===
-    "p75"
-  ) {
-
-    waitHours =
-      Number(
-        model.p75_hours
-      );
-
-  }
-
-
-  if (
-    scenario.value ===
-    "p90"
-  ) {
-
-    waitHours =
-      Number(
-        model.p90_hours
-      );
-
-  }
-
-
-  if (
-    !isFinite(
-      waitHours
-    ) ||
-    waitHours <= 0
-  ) {
-
-    calculationInfo.textContent =
-      "Brak wystarczających danych do obliczenia.";
-
-    return;
-  }
 
 
   const registration =
@@ -2278,182 +2636,228 @@ function calculateTarget() {
     );
 
 
-  targetDisplay.textContent =
-    formatDateTime(
-      target
-    );
-
-
-  registrationDisplay.textContent =
+  $("registrationResult")
+    .textContent =
     formatDateTime(
       registration
     );
 
 
-  let scenarioName =
-    "medianę";
+  const scenario =
+    $("waitScenario")
+      .selectedOptions[0]
+      .textContent;
 
 
-  if (
-    scenario.value ===
-    "p75"
-  ) {
-
-    scenarioName =
-      "P75";
-
-  }
-
-
-  if (
-    scenario.value ===
-    "p90"
-  ) {
-
-    scenarioName =
-      "P90";
-
-  }
-
-
-  calculationInfo.textContent =
-    "Obliczenie używa " +
-    scenarioName +
+  $("registrationDescription")
+    .textContent =
+    "Obliczenie wykorzystuje " +
+    scenario +
     " = " +
-    number(
-      waitHours,
-      2
+    formatHours(
+      waitHours
     ) +
-    " h. " +
-    "Godziny są wyświetlane według strefy czasowej urządzenia.";
+    ". Jest to szacunek, a nie gwarantowana godzina wywołania.";
 
 }
 
 
-/* ==============================================================
-   DOMYŚLNY CEL
-   ============================================================== */
+/* ================================================================
+   STREFA CZASOWA
+   ================================================================ */
 
-function setDefaultTarget() {
+function updateTimezoneInfo() {
+
+  const timezone =
+    Intl.DateTimeFormat()
+      .resolvedOptions()
+      .timeZone;
+
 
   const now =
     new Date();
 
 
-  const target =
-    new Date(
-      now
-    );
+  const offsetMinutes =
+    -now.getTimezoneOffset();
 
 
-  const day =
-    now.getDay();
+  const sign =
+    offsetMinutes >= 0
+      ? "+"
+      : "-";
 
 
-  let daysUntilSunday =
-    (7 - day) % 7;
-
-
-  if (
-    daysUntilSunday === 0 &&
-    (
-      now.getHours() > 9 ||
-      (
-        now.getHours() === 9 &&
-        now.getMinutes() >= 30
-      )
-    )
-  ) {
-
-    daysUntilSunday =
-      7;
-
-  }
-
-
-  target.setDate(
-    now.getDate() +
-    daysUntilSunday
-  );
-
-
-  target.setHours(
-    9,
-    30,
-    0,
-    0
-  );
-
-
-  const year =
-    target.getFullYear();
-
-
-  const month =
-    String(
-      target.getMonth() + 1
-    ).padStart(
-      2,
-      "0"
-    );
-
-
-  const dayNumber =
-    String(
-      target.getDate()
-    ).padStart(
-      2,
-      "0"
+  const absolute =
+    Math.abs(
+      offsetMinutes
     );
 
 
   const hours =
-    String(
-      target.getHours()
-    ).padStart(
-      2,
-      "0"
+    Math.floor(
+      absolute / 60
     );
 
 
   const minutes =
+    absolute % 60;
+
+
+  const offset =
+    sign +
+    String(hours)
+      .padStart(2, "0") +
+    ":" +
+    String(minutes)
+      .padStart(2, "0");
+
+
+  $("timezoneInfo").value =
+    timezone +
+    " (UTC" +
+    offset +
+    ")";
+
+}
+
+
+/* ================================================================
+   DOM EVENTS
+   ================================================================ */
+
+$("targetDate")
+  .addEventListener(
+    "change",
+    calculateRegistration
+  );
+
+
+$("targetTime")
+  .addEventListener(
+    "change",
+    calculateRegistration
+  );
+
+
+$("waitScenario")
+  .addEventListener(
+    "change",
+    calculateRegistration
+  );
+
+
+/* ================================================================
+   DOMYŚLNA DATA — NAJBLIŻSZY DZIEŃ
+   ================================================================ */
+
+function setDefaultDate() {
+
+  const now =
+    new Date();
+
+
+  const year =
+    now.getFullYear();
+
+
+  const month =
     String(
-      target.getMinutes()
+      now.getMonth() + 1
     ).padStart(
       2,
       "0"
     );
 
 
-  targetDate.value =
+  const day =
+    String(
+      now.getDate()
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  $("targetDate").value =
     year +
     "-" +
     month +
     "-" +
-    dayNumber +
-    "T" +
-    hours +
-    ":" +
-    minutes;
+    day;
 
 }
 
 
-/* ==============================================================
-   ZDARZENIA
-   ============================================================== */
+/* ================================================================
+   ODŚWIEŻANIE
+   ================================================================ */
 
-targetDate.addEventListener(
-  "change",
-  calculateTarget
+async function refreshAll() {
+
+  try {
+
+    await Promise.all([
+      loadModel(),
+      loadChartData()
+    ]);
+
+
+    $("refreshInfo")
+      .textContent =
+      " · ostatnie odświeżenie: " +
+      formatDateTime(
+        new Date()
+      );
+
+  }
+  catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    $("modelStatus")
+      .innerHTML =
+      "<span class='error'>" +
+      "Błąd pobierania danych: " +
+      error.message +
+      "</span>";
+
+  }
+
+}
+
+
+/* ================================================================
+   START
+   ================================================================ */
+
+setDefaultDate();
+
+updateTimezoneInfo();
+
+setChartRange(24);
+
+refreshAll();
+
+
+/*
+ * Automatyczne odświeżanie co 60 sekund.
+ * Kolektor zapisuje nowe dane co 15 minut.
+ */
+
+setInterval(
+  refreshAll,
+  60 * 1000
 );
 
 
-scenario.addEventListener(
-  "change",
-  calculateTarget
-);
-
+/*
+ * Po zmianie rozmiaru okna
+ * przerysuj wykres.
+ */
 
 window.addEventListener(
   "resize",
@@ -2462,33 +2866,6 @@ window.addEventListener(
     drawChart();
 
   }
-);
-
-
-/* ==============================================================
-   START
-   ============================================================== */
-
-setDefaultTarget();
-
-loadModel();
-
-loadChartData();
-
-
-/* ==============================================================
-   AUTOMATYCZNE ODŚWIEŻANIE
-   ============================================================== */
-
-setInterval(
-  async function() {
-
-    await loadModel();
-
-    await loadChartData();
-
-  },
-  5 * 60 * 1000
 );
 
 </script>
