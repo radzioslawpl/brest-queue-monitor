@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Brest Queue Monitor</title>
 
   <style>
@@ -19,7 +18,7 @@
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1150px;
       margin: 0 auto;
       padding: 24px;
     }
@@ -30,11 +29,12 @@
 
     h1 {
       margin: 0 0 6px;
-      font-size: 32px;
+      font-size: 34px;
     }
 
     .subtitle {
       color: #68727d;
+      font-size: 18px;
     }
 
     .status {
@@ -86,11 +86,51 @@
       margin-top: 0;
     }
 
+    .trend {
+      font-size: 18px;
+      margin-bottom: 18px;
+    }
+
+    .good {
+      color: #176b35;
+    }
+
+    .warning {
+      color: #9a6700;
+    }
+
+    .bad {
+      color: #b42318;
+    }
+
+    .muted {
+      color: #68727d;
+    }
+
+    .model-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .model-box {
+      background: #f7f8fa;
+      border-radius: 10px;
+      padding: 15px;
+    }
+
+    .model-box strong {
+      display: block;
+      font-size: 22px;
+      margin-top: 6px;
+    }
+
     .target-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 14px;
-      max-width: 600px;
+      max-width: 650px;
     }
 
     label {
@@ -129,17 +169,17 @@
       background: #f1f5f9;
     }
 
-    .result-big {
-      font-size: 25px;
-      font-weight: 700;
-      margin: 6px 0;
+    .result-row {
+      margin-top: 15px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
     }
 
-    .recommendation {
-      margin-top: 15px;
-      padding: 16px;
-      border-radius: 10px;
-      background: #eef6ff;
+    .result-big {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 6px 0;
     }
 
     .note {
@@ -147,6 +187,11 @@
       color: #68727d;
       line-height: 1.5;
       margin-top: 10px;
+    }
+
+    .quality {
+      font-size: 17px;
+      margin-bottom: 8px;
     }
 
     .error {
@@ -157,38 +202,17 @@
       margin-top: 15px;
     }
 
-    .good {
-      color: #176b35;
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: #fff3cd;
+      color: #7a5a00;
+      font-size: 13px;
+      font-weight: 600;
     }
 
-    .warning {
-      color: #9a6700;
-    }
-
-    .muted {
-      color: #68727d;
-    }
-
-    .model-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-top: 15px;
-    }
-
-    .model-box {
-      background: #f7f8fa;
-      border-radius: 10px;
-      padding: 14px;
-    }
-
-    .model-box strong {
-      display: block;
-      font-size: 20px;
-      margin-top: 5px;
-    }
-
-    @media (max-width: 800px) {
+    @media (max-width: 850px) {
       .grid {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -203,6 +227,10 @@
         padding: 14px;
       }
 
+      h1 {
+        font-size: 28px;
+      }
+
       .grid {
         grid-template-columns: 1fr 1fr;
       }
@@ -211,12 +239,12 @@
         grid-template-columns: 1fr 1fr;
       }
 
-      .value {
-        font-size: 24px;
-      }
-
       .target-grid {
         grid-template-columns: 1fr;
+      }
+
+      .value {
+        font-size: 24px;
       }
     }
   </style>
@@ -228,9 +256,7 @@
 
   <header>
 
-    <h1>
-      🚗 Brest Queue Monitor
-    </h1>
+    <h1>🚗 Brest Queue Monitor</h1>
 
     <div class="subtitle">
       Elektroniczna kolejka Brest → Polska
@@ -245,7 +271,9 @@
   </header>
 
 
-  <!-- AKTUALNY STAN -->
+  <!-- =========================================
+       AKTUALNY STAN
+  ========================================== -->
 
   <div class="grid">
 
@@ -282,7 +310,7 @@
     <div class="card">
 
       <div class="label">
-        Zmiana 1 h
+        Zmiana ostatnia 1 h
       </div>
 
       <div
@@ -291,9 +319,9 @@
         —
       </div>
 
-      <span class="unit">
-        aut
-      </span>
+      <div class="unit">
+        samochodów
+      </div>
 
     </div>
 
@@ -321,7 +349,9 @@
   </div>
 
 
-  <!-- DYNAMIKA -->
+  <!-- =========================================
+       DYNAMIKA
+  ========================================== -->
 
   <div class="section">
 
@@ -329,7 +359,9 @@
       📉 Dynamika kolejki
     </h2>
 
-    <div id="trendText">
+    <div
+      class="trend"
+      id="trendText">
       Ładowanie...
     </div>
 
@@ -338,14 +370,14 @@
 
       <div class="model-box">
 
-        Ostatnie 30 min
+        Zmiana 30 min
 
-        <strong id="rate30">
+        <strong id="change30">
           —
         </strong>
 
         <span class="unit">
-          aut/h
+          aut
         </span>
 
       </div>
@@ -353,9 +385,9 @@
 
       <div class="model-box">
 
-        Ostatnia 1 h
+        Tempo netto 30 min
 
-        <strong id="rate1">
+        <strong id="rate30">
           —
         </strong>
 
@@ -397,10 +429,21 @@
 
     </div>
 
+
+    <div class="note">
+
+      „Tempo netto” oznacza zmianę liczby samochodów
+      widocznych w monitoringu. Nie jest to jeszcze
+      oficjalna przepustowość granicy.
+
+    </div>
+
   </div>
 
 
-  <!-- KALKULATOR -->
+  <!-- =========================================
+       KALKULATOR
+  ========================================== -->
 
   <div class="section">
 
@@ -457,7 +500,9 @@
   </div>
 
 
-  <!-- JAKOŚĆ MODELU -->
+  <!-- =========================================
+       JAKOŚĆ MODELU
+  ========================================== -->
 
   <div class="section">
 
@@ -465,51 +510,57 @@
       📊 Jakość modelu
     </h2>
 
-    <div id="modelQuality">
+    <div
+      class="quality"
+      id="modelQuality">
       Ładowanie...
     </div>
 
-    <div class="note">
-
-      Model korzysta z rzeczywistych obserwacji
-      czasu od rejestracji do powołania.
-
-      Im więcej samochodów zostanie zaobserwowanych,
-      tym stabilniejsze będą statystyki.
-
+    <div
+      id="modelDetails">
     </div>
 
   </div>
 
 
-  <!-- INFORMACJE -->
+  <!-- =========================================
+       INFORMACJE
+  ========================================== -->
 
   <div class="section">
 
     <h2>
-      ℹ️ Informacje
+      ℹ️ Jak działa prognoza?
     </h2>
 
     <div class="note">
 
-      Dane są pobierane automatycznie z monitoringu
-      i zapisywane w Supabase co 15 minut.
+      Kalkulator wykorzystuje rzeczywiste czasy
+      od rejestracji samochodu do jego powołania.
 
       <br><br>
 
-      Czasy są przechowywane w UTC,
-      a strona wyświetla je zgodnie ze strefą
-      czasową urządzenia.
+      <strong>Mediana</strong> pokazuje typowy czas
+      oczekiwania.
+
+      <br>
+
+      <strong>P75</strong> jest wariantem bardziej
+      ostrożnym.
+
+      <br>
+
+      <strong>P90</strong> jest wariantem bardzo
+      ostrożnym.
 
       <br><br>
 
-      <strong>
-        Ważne:
-      </strong>
-
-      aktualny model jest jeszcze wersją wstępną.
-      Nie traktuj prognozy jako gwarancji godziny
-      powołania.
+      Model jest obecnie w fazie uczenia. Kolektor
+      zapisuje nowy pomiar co 15 minut. Wraz ze
+      wzrostem liczby obserwacji będziemy mogli
+      uwzględnić również dłuższą historię oraz
+      zachowanie kolejki w różnych porach dnia
+      i w weekendy.
 
     </div>
 
@@ -538,11 +589,23 @@ const CHECKPOINT_ID =
 
 /*
 ====================================================
+ AKTUALNY MODEL
+====================================================
+*/
+
+let currentModel = null;
+
+
+/*
+====================================================
  SUPABASE
 ====================================================
 */
 
-async function supabaseFetch(table, query) {
+async function supabaseFetch(
+  table,
+  query
+) {
 
   const url =
     SUPABASE_URL +
@@ -553,13 +616,16 @@ async function supabaseFetch(table, query) {
 
 
   const response =
-    await fetch(url, {
-
-      headers: {
-        "apikey": SUPABASE_KEY
+    await fetch(
+      url,
+      {
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization":
+            "Bearer " + SUPABASE_KEY
+        }
       }
-
-    });
+    );
 
 
   if (!response.ok) {
@@ -580,11 +646,41 @@ async function supabaseFetch(table, query) {
 
 /*
 ====================================================
+ FORMAT LICZBY
+====================================================
+*/
+
+function numberValue(
+  value,
+  decimals = 1
+) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    Number.isNaN(Number(value))
+  ) {
+
+    return "—";
+
+  }
+
+
+  return Number(value)
+    .toFixed(decimals);
+
+}
+
+
+/*
+====================================================
  FORMAT CZASU
 ====================================================
 */
 
-function formatLocal(iso) {
+function formatLocal(
+  iso
+) {
 
   return new Intl.DateTimeFormat(
     undefined,
@@ -601,21 +697,21 @@ function formatLocal(iso) {
 
 /*
 ====================================================
- ZAOKRĄGLENIE
+ FORMAT GODZINY
 ====================================================
 */
 
-function round(value, decimals = 1) {
+function formatDateTime(
+  date
+) {
 
-  if (
-    value === null ||
-    value === undefined ||
-    Number.isNaN(Number(value))
-  ) {
-    return "—";
-  }
-
-  return Number(value).toFixed(decimals);
+  return new Intl.DateTimeFormat(
+    undefined,
+    {
+      dateStyle: "short",
+      timeStyle: "short"
+    }
+  ).format(date);
 
 }
 
@@ -626,9 +722,6 @@ function round(value, decimals = 1) {
 ====================================================
 */
 
-let currentModel = null;
-
-
 async function loadModel() {
 
   try {
@@ -636,7 +729,7 @@ async function loadModel() {
     const rows =
       await supabaseFetch(
 
-        "queue_model",
+        "queue_model_v2",
 
         "checkpoint_id=eq." +
         CHECKPOINT_ID +
@@ -651,7 +744,7 @@ async function loadModel() {
     if (!rows.length) {
 
       throw new Error(
-        "Brak danych w queue_model"
+        "Brak danych w queue_model_v2"
       );
 
     }
@@ -664,7 +757,6 @@ async function loadModel() {
     updatePage(
       currentModel
     );
-
 
   }
 
@@ -696,11 +788,13 @@ async function loadModel() {
 ====================================================
 */
 
-function updatePage(model) {
+function updatePage(
+  model
+) {
 
   /*
   ----------------------------------------------
-  STAN KOLEJKI
+  AKTUALNY STAN
   ----------------------------------------------
   */
 
@@ -718,51 +812,71 @@ function updatePage(model) {
 
   /*
   ----------------------------------------------
-  DYNAMIKA
+  ZMIANA 1H
   ----------------------------------------------
   */
+
+  const change1h =
+    model.change_1h;
+
 
   document.getElementById(
     "change1h"
   ).textContent =
 
-    model.change_1h === null
+    change1h === null
       ? "—"
       : (
-          model.change_1h > 0
-            ? "+" + model.change_1h
-            : model.change_1h
+          Number(change1h) > 0
+            ? "+" + change1h
+            : change1h
         );
 
+
+  /*
+  ----------------------------------------------
+  ZMIANA 30 MIN
+  ----------------------------------------------
+  */
+
+  document.getElementById(
+    "change30"
+  ).textContent =
+
+    model.change_30min === null
+      ? "—"
+      : (
+          Number(model.change_30min) > 0
+            ? "+" + model.change_30min
+            : model.change_30min
+        );
+
+
+  /*
+  ----------------------------------------------
+  TEMPO NETTO
+  ----------------------------------------------
+  */
 
   document.getElementById(
     "rate30"
   ).textContent =
-    round(
+    numberValue(
       model.net_queue_rate_30m,
-      1
-    );
-
-
-  document.getElementById(
-    "rate1"
-  ).textContent =
-    round(
-      model.net_queue_rate_1h,
       1
     );
 
 
   /*
   ----------------------------------------------
-  CZAS OCZEKIWANIA
+  STATYSTYKI OCZEKIWANIA
   ----------------------------------------------
   */
 
   document.getElementById(
     "median"
   ).textContent =
-    round(
+    numberValue(
       model.median_hours,
       2
     );
@@ -771,7 +885,7 @@ function updatePage(model) {
   document.getElementById(
     "p75"
   ).textContent =
-    round(
+    numberValue(
       model.p75_hours,
       2
     );
@@ -780,7 +894,7 @@ function updatePage(model) {
   document.getElementById(
     "p90"
   ).textContent =
-    round(
+    numberValue(
       model.p90_hours,
       2
     );
@@ -799,60 +913,57 @@ function updatePage(model) {
 
 
   if (
-    model.net_queue_rate_1h !== null &&
-    Number(model.net_queue_rate_1h) < 0
+    model.change_1h !== null &&
+    Number(model.change_1h) < 0
   ) {
 
-    trend.innerHTML =
+    trend.className =
+      "trend good";
 
-      '<span class="good">' +
 
+    trend.textContent =
       "↓ Kolejka maleje. " +
-
       "W ostatniej godzinie stan zmniejszył się o " +
-
       Math.abs(
-        model.change_1h
+        Number(model.change_1h)
       ) +
-
-      " aut." +
-
-      "</span>";
+      " aut.";
 
   }
 
   else if (
-    model.net_queue_rate_1h !== null &&
-    Number(model.net_queue_rate_1h) > 0
+    model.change_1h !== null &&
+    Number(model.change_1h) > 0
   ) {
 
-    trend.innerHTML =
+    trend.className =
+      "trend warning";
 
-      '<span class="warning">' +
 
+    trend.textContent =
       "↑ Kolejka rośnie. " +
-
-      "W ostatniej godzinie przybyło około " +
-
-      model.change_1h +
-
-      " aut." +
-
-      "</span>";
+      "W ostatniej godzinie przybyło " +
+      Number(model.change_1h) +
+      " aut.";
 
   }
 
   else {
 
+    trend.className =
+      "trend muted";
+
+
     trend.textContent =
-      "→ Brak wystarczających danych do określenia trendu.";
+      "→ Brak wystarczających danych "
+      + "do określenia trendu.";
 
   }
 
 
   /*
   ----------------------------------------------
-  JAKOŚĆ
+  JAKOŚĆ MODELU
   ----------------------------------------------
   */
 
@@ -862,60 +973,63 @@ function updatePage(model) {
     );
 
 
-  let qualityText = "";
+  const details =
+    document.getElementById(
+      "modelDetails"
+    );
 
 
-  if (
-    model.data_quality ===
-    "mało danych"
-  ) {
-
-    qualityText =
-      "🔴 Mało danych — prognoza orientacyjna.";
-
-  }
-
-  else if (
-    model.data_quality ===
-    "wstępna"
-  ) {
-
-    qualityText =
-      "🟡 Wstępna — model ma " +
-      model.completed_events +
-      " zakończonych obserwacji.";
-
-  }
-
-  else if (
-    model.data_quality ===
-    "umiarkowana"
-  ) {
-
-    qualityText =
-      "🟢 Umiarkowana — model ma " +
-      model.completed_events +
-      " obserwacji.";
-
-  }
-
-  else {
-
-    qualityText =
-      "🟢 Dobra — model ma " +
-      model.completed_events +
-      " obserwacji.";
-
-  }
+  quality.innerHTML =
+    '<span class="badge">' +
+    (model.model_status || "brak statusu") +
+    "</span>";
 
 
-  quality.textContent =
-    qualityText;
+  details.innerHTML =
+
+    '<div class="note">' +
+
+    "Zakończone obserwacje: <strong>" +
+
+    (model.completed_events ?? "—") +
+
+    "</strong><br>" +
+
+    "Historia 6 h: <strong>" +
+
+    (
+      model.has_6h_queue_history
+        ? "tak"
+        : "jeszcze nie"
+    ) +
+
+    "</strong><br>" +
+
+    "Próba ≥100 obserwacji: <strong>" +
+
+    (
+      model.has_large_wait_sample
+        ? "tak"
+        : "jeszcze nie"
+    ) +
+
+    "</strong><br>" +
+
+    "Korekta dynamiczna: <strong>" +
+
+    numberValue(
+      model.dynamic_adjustment_hours,
+      2
+    ) +
+
+    " h</strong>" +
+
+    "</div>";
 
 
   /*
   ----------------------------------------------
-  STATUS
+  STATUS AKTUALIZACJI
   ----------------------------------------------
   */
 
@@ -990,7 +1104,7 @@ function calculateTarget() {
 
   /*
   ----------------------------------------------
-  CZASY MODELU
+  CZASY
   ----------------------------------------------
   */
 
@@ -1012,9 +1126,24 @@ function calculateTarget() {
     );
 
 
+  if (
+    !Number.isFinite(medianHours) ||
+    !Number.isFinite(p75Hours) ||
+    !Number.isFinite(p90Hours)
+  ) {
+
+    alert(
+      "Brak wystarczających danych do obliczenia prognozy."
+    );
+
+    return;
+
+  }
+
+
   /*
   ----------------------------------------------
-  REJESTRACJA
+  TERMINY REJESTRACJI
   ----------------------------------------------
   */
 
@@ -1060,28 +1189,34 @@ function calculateTarget() {
 
   result.innerHTML =
 
-    "<div>🎯 <strong>Cel powołania:</strong></div>" +
+    "<div>" +
+    "🎯 <strong>Twój cel:</strong>" +
+    "</div>" +
 
     '<div class="result-big">' +
 
-    target.toLocaleString() +
+    formatDateTime(
+      target
+    ) +
 
     "</div>" +
 
 
-    '<div class="recommendation">' +
+    '<div class="result-row">' +
 
-    "<strong>Najbardziej prawdopodobnie:</strong>" +
+    "🟢 <strong>Typowy wariant</strong>" +
 
-    "<div class=\"result-big\">" +
+    '<div class="result-big">' +
 
-    medianRegistration.toLocaleString() +
+    formatDateTime(
+      medianRegistration
+    ) +
 
     "</div>" +
 
-    "na podstawie mediany " +
+    "Mediana: " +
 
-    round(
+    numberValue(
       medianHours,
       2
     ) +
@@ -1091,19 +1226,21 @@ function calculateTarget() {
     "</div>" +
 
 
-    '<div class="recommendation">' +
+    '<div class="result-row">' +
 
-    "<strong>Bezpieczniejszy wariant:</strong>" +
+    "🟡 <strong>Bezpieczniejszy wariant</strong>" +
 
-    "<div class=\"result-big\">" +
+    '<div class="result-big">' +
 
-    p75Registration.toLocaleString() +
+    formatDateTime(
+      p75Registration
+    ) +
 
     "</div>" +
 
-    "na podstawie P75 " +
+    "P75: " +
 
-    round(
+    numberValue(
       p75Hours,
       2
     ) +
@@ -1113,19 +1250,21 @@ function calculateTarget() {
     "</div>" +
 
 
-    '<div class="recommendation">' +
+    '<div class="result-row">' +
 
-    "<strong>Bardzo ostrożny wariant:</strong>" +
+    "🔴 <strong>Bardzo ostrożny wariant</strong>" +
 
-    "<div class=\"result-big\">" +
+    '<div class="result-big">' +
 
-    p90Registration.toLocaleString() +
+    formatDateTime(
+      p90Registration
+    ) +
 
     "</div>" +
 
-    "na podstawie P90 " +
+    "P90: " +
 
-    round(
+    numberValue(
       p90Hours,
       2
     ) +
@@ -1137,13 +1276,13 @@ function calculateTarget() {
 
     '<div class="note">' +
 
-    "To nadal prognoza, nie gwarancja. " +
+    "Czasy są wyświetlane według strefy " +
 
-    "Model uwzględnia obecnie rzeczywisty rozkład " +
+    "czasowej Twojego urządzenia. " +
 
-    "czasów oczekiwania. W kolejnych etapach " +
+    "Prognoza jest orientacyjna i nie stanowi " +
 
-    "dodamy korektę wynikającą z dynamiki kolejki." +
+    "gwarancji godziny powołania." +
 
     "</div>";
 
@@ -1161,10 +1300,6 @@ function setDefaultDate() {
   const now =
     new Date();
 
-
-  /*
-  Domyślnie trzy dni do przodu.
-  */
 
   now.setDate(
     now.getDate() + 3
@@ -1219,7 +1354,7 @@ loadModel();
 
 /*
 ====================================================
- ODŚWIEŻANIE
+ AUTOMATYCZNE ODŚWIEŻANIE
 ====================================================
 */
 
