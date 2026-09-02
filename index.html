@@ -1,9 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brest Queue Monitor</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brest BTS — monitor kolejki</title>
 
   <style>
     * {
@@ -12,40 +12,30 @@
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       background: #f4f6f8;
-      color: #17202a;
+      color: #1f2937;
     }
 
     .container {
-      max-width: 1150px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 24px;
-    }
-
-    header {
-      margin-bottom: 24px;
+      padding: 24px 16px 50px;
     }
 
     h1 {
       margin: 0 0 6px;
-      font-size: 34px;
+      font-size: 30px;
     }
 
     .subtitle {
-      color: #68727d;
-      font-size: 18px;
-    }
-
-    .status {
-      margin-top: 12px;
-      font-size: 14px;
-      color: #68727d;
+      color: #6b7280;
+      margin-bottom: 24px;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
       gap: 14px;
       margin-bottom: 20px;
     }
@@ -53,194 +43,120 @@
     .card {
       background: white;
       border-radius: 14px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+      padding: 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
     }
 
     .label {
-      color: #68727d;
-      font-size: 14px;
-      margin-bottom: 8px;
+      font-size: 13px;
+      color: #6b7280;
+      margin-bottom: 7px;
     }
 
     .value {
-      font-size: 30px;
+      font-size: 28px;
       font-weight: 700;
     }
 
     .unit {
       font-size: 14px;
       font-weight: 400;
-      color: #68727d;
+      color: #6b7280;
     }
 
     .section {
       background: white;
       border-radius: 14px;
-      padding: 22px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+      padding: 20px;
+      margin-top: 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
     }
 
     .section h2 {
       margin-top: 0;
+      font-size: 21px;
     }
 
-    .trend {
-      font-size: 18px;
-      margin-bottom: 18px;
-    }
-
-    .good {
-      color: #176b35;
-    }
-
-    .warning {
-      color: #9a6700;
-    }
-
-    .bad {
-      color: #b42318;
-    }
-
-    .muted {
-      color: #68727d;
-    }
-
-    .model-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-top: 15px;
-    }
-
-    .model-box {
-      background: #f7f8fa;
-      border-radius: 10px;
-      padding: 15px;
-    }
-
-    .model-box strong {
-      display: block;
-      font-size: 22px;
-      margin-top: 6px;
-    }
-
-    .target-grid {
+    .target-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 14px;
-      max-width: 650px;
-    }
-
-    label {
-      font-size: 14px;
-      color: #68727d;
+      margin-top: 14px;
     }
 
     input {
       width: 100%;
       padding: 12px;
-      margin-top: 6px;
-      border: 1px solid #ccd2d8;
-      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 9px;
       font-size: 16px;
-    }
-
-    button {
-      margin-top: 18px;
-      padding: 13px 20px;
-      border: 0;
-      border-radius: 8px;
-      background: #1f6feb;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      opacity: .9;
     }
 
     .result {
-      margin-top: 20px;
-      padding: 18px;
-      border-radius: 10px;
-      background: #f1f5f9;
-    }
-
-    .result-row {
-      margin-top: 15px;
-      padding: 15px;
-      background: white;
+      margin-top: 18px;
+      padding: 16px;
+      background: #f3f4f6;
       border-radius: 10px;
     }
 
-    .result-big {
-      font-size: 24px;
-      font-weight: 700;
-      margin: 6px 0;
+    .result strong {
+      font-size: 20px;
     }
 
-    .note {
+    .small {
       font-size: 13px;
-      color: #68727d;
+      color: #6b7280;
       line-height: 1.5;
-      margin-top: 10px;
     }
 
-    .quality {
-      font-size: 17px;
-      margin-bottom: 8px;
+    .status {
+      margin-top: 20px;
+      padding: 12px 14px;
+      border-radius: 9px;
+      background: #eef2ff;
+      color: #3730a3;
+      font-size: 14px;
+    }
+
+    .warning {
+      background: #fff7ed;
+      color: #9a3412;
+    }
+
+    .ok {
+      background: #ecfdf5;
+      color: #065f46;
     }
 
     .error {
-      color: #b42318;
-      background: #fef3f2;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 15px;
+      background: #fef2f2;
+      color: #991b1b;
     }
 
-    .badge {
+    .quality {
       display: inline-block;
       padding: 5px 9px;
-      border-radius: 20px;
-      background: #fff3cd;
-      color: #7a5a00;
-      font-size: 13px;
-      font-weight: 600;
+      border-radius: 999px;
+      font-size: 12px;
+      background: #fef3c7;
+      color: #92400e;
+      margin-top: 8px;
     }
 
-    @media (max-width: 850px) {
-      .grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .model-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+    .footer {
+      margin-top: 24px;
+      color: #6b7280;
+      font-size: 12px;
+      line-height: 1.5;
     }
 
-    @media (max-width: 520px) {
-      .container {
-        padding: 14px;
+    @media (max-width: 650px) {
+      .target-row {
+        grid-template-columns: 1fr;
       }
 
       h1 {
-        font-size: 28px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .model-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .target-grid {
-        grid-template-columns: 1fr;
+        font-size: 25px;
       }
 
       .value {
@@ -254,316 +170,245 @@
 
 <div class="container">
 
-  <header>
+  <h1>🚗 Brest BTS — monitor kolejki</h1>
 
-    <h1>🚗 Brest Queue Monitor</h1>
+  <div class="subtitle">
+    Elektroniczna kolejka samochodów • dane aktualizowane automatycznie
+  </div>
 
-    <div class="subtitle">
-      Elektroniczna kolejka Brest → Polska
-    </div>
-
-    <div
-      class="status"
-      id="status">
-      Łączenie z bazą danych...
-    </div>
-
-  </header>
-
-
-  <!-- =========================================
-       AKTUALNY STAN
-  ========================================== -->
-
+  <!-- AKTUALNY STAN -->
   <div class="grid">
 
     <div class="card">
-
-      <div class="label">
-        Samochody oczekujące
-      </div>
-
-      <div
-        class="value"
-        id="waiting">
-        —
-      </div>
-
+      <div class="label">Samochody oczekujące</div>
+      <div class="value" id="waitingCars">—</div>
     </div>
 
-
     <div class="card">
-
-      <div class="label">
-        Powołane / widoczne
-      </div>
-
-      <div
-        class="value"
-        id="called">
-        —
-      </div>
-
+      <div class="label">Samochody wywołane</div>
+      <div class="value" id="calledCars">—</div>
     </div>
 
-
     <div class="card">
-
-      <div class="label">
-        Zmiana ostatnia 1 h
-      </div>
-
-      <div
-        class="value"
-        id="change1h">
-        —
-      </div>
-
-      <div class="unit">
-        samochodów
-      </div>
-
+      <div class="label">Monitoring / API</div>
+      <div class="value" id="monitoringCount">—</div>
     </div>
 
-
     <div class="card">
-
-      <div class="label">
-        Mediana oczekiwania
-      </div>
-
-      <div class="value">
-
-        <span id="median">
-          —
-        </span>
-
-        <span class="unit">
-          h
-        </span>
-
-      </div>
-
+      <div class="label">Zmiana kolejki — 1 h</div>
+      <div class="value" id="change1h">—</div>
+      <div class="unit">aut./h</div>
     </div>
 
   </div>
 
 
-  <!-- =========================================
-       DYNAMIKA
-  ========================================== -->
-
+  <!-- MODEL CZASU OCZEKIWANIA -->
   <div class="section">
 
-    <h2>
-      📉 Dynamika kolejki
-    </h2>
+    <h2>⏱️ Szacowany czas oczekiwania</h2>
 
-    <div
-      class="trend"
-      id="trendText">
-      Ładowanie...
-    </div>
+    <div class="grid">
 
-
-    <div class="model-grid">
-
-      <div class="model-box">
-
-        Zmiana 30 min
-
-        <strong id="change30">
-          —
-        </strong>
-
-        <span class="unit">
-          aut
-        </span>
-
+      <div class="card">
+        <div class="label">P25</div>
+        <div class="value">
+          <span id="p25">—</span>
+          <span class="unit">h</span>
+        </div>
       </div>
 
-
-      <div class="model-box">
-
-        Tempo netto 30 min
-
-        <strong id="rate30">
-          —
-        </strong>
-
-        <span class="unit">
-          aut/h
-        </span>
-
+      <div class="card">
+        <div class="label">Mediana</div>
+        <div class="value">
+          <span id="median">—</span>
+          <span class="unit">h</span>
+        </div>
       </div>
 
-
-      <div class="model-box">
-
-        P75 oczekiwania
-
-        <strong id="p75">
-          —
-        </strong>
-
-        <span class="unit">
-          h
-        </span>
-
+      <div class="card">
+        <div class="label">P75</div>
+        <div class="value">
+          <span id="p75">—</span>
+          <span class="unit">h</span>
+        </div>
       </div>
 
-
-      <div class="model-box">
-
-        P90 oczekiwania
-
-        <strong id="p90">
-          —
-        </strong>
-
-        <span class="unit">
-          h
-        </span>
-
+      <div class="card">
+        <div class="label">P90 — ostrożnie</div>
+        <div class="value">
+          <span id="p90">—</span>
+          <span class="unit">h</span>
+        </div>
       </div>
 
     </div>
 
-
-    <div class="note">
-
-      „Tempo netto” oznacza zmianę liczby samochodów
-      widocznych w monitoringu. Nie jest to jeszcze
-      oficjalna przepustowość granicy.
-
+    <div id="modelStatus" class="quality">
+      Ładowanie modelu...
     </div>
+
+    <p class="small">
+      Mediana pokazuje typowy czas oczekiwania na podstawie zebranych
+      zakończonych przejazdów. P90 jest wariantem bardziej ostrożnym.
+      Model będzie poprawiał się wraz z napływem kolejnych danych.
+    </p>
 
   </div>
 
 
-  <!-- =========================================
-       KALKULATOR
-  ========================================== -->
-
+  <!-- CEL -->
   <div class="section">
 
-    <h2>
-      🎯 Kiedy chcesz być powołany?
-    </h2>
+    <h2>🎯 Kiedy zapisać się do kolejki?</h2>
 
-    <div class="target-grid">
+    <p class="small">
+      Wybierz dowolną datę i godzinę, o której chcesz zostać wywołany.
+      Kalkulator cofnie się o przewidywany czas oczekiwania.
+    </p>
+
+    <div class="target-row">
 
       <div>
-
-        <label for="targetDate">
-          Data
-        </label>
-
+        <div class="label">Docelowa data i godzina</div>
         <input
+          type="datetime-local"
           id="targetDate"
-          type="date">
-
+        />
       </div>
-
 
       <div>
+        <div class="label">Wariant obliczenia</div>
 
-        <label for="targetTime">
-          Godzina
-        </label>
-
-        <input
-          id="targetTime"
-          type="time"
-          value="09:30">
+        <select
+          id="scenario"
+          style="
+            width:100%;
+            padding:12px;
+            border:1px solid #d1d5db;
+            border-radius:9px;
+            font-size:16px;
+            background:white;
+          "
+        >
+          <option value="median">Mediana — typowy wariant</option>
+          <option value="p75">P75 — ostrożniej</option>
+          <option value="p90">P90 — bardzo ostrożnie</option>
+        </select>
 
       </div>
 
     </div>
 
 
-    <button
-      onclick="calculateTarget()">
+    <div class="result">
 
-      OBLICZ TERMIN REJESTRACJI
+      <div class="small">
+        Docelowe wywołanie:
+      </div>
 
-    </button>
+      <strong id="targetDisplay">
+        —
+      </strong>
 
+      <br><br>
 
-    <div
-      class="result"
-      id="result"
-      style="display:none">
+      <div class="small">
+        Orientacyjny moment zapisania się:
+      </div>
+
+      <strong id="registrationDisplay">
+        —
+      </strong>
+
+      <br><br>
+
+      <div class="small" id="calculationInfo">
+        —
+      </div>
 
     </div>
 
   </div>
 
 
-  <!-- =========================================
-       JAKOŚĆ MODELU
-  ========================================== -->
-
+  <!-- DYNAMIKA -->
   <div class="section">
 
-    <h2>
-      📊 Jakość modelu
-    </h2>
+    <h2>📈 Dynamika kolejki</h2>
 
-    <div
-      class="quality"
-      id="modelQuality">
-      Ładowanie...
+    <div class="grid">
+
+      <div class="card">
+        <div class="label">Zmiana 30 min</div>
+        <div class="value" id="change30">—</div>
+        <div class="unit">aut.</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Zmiana 1 h</div>
+        <div class="value" id="change1">—</div>
+        <div class="unit">aut.</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Tempo netto 30 min</div>
+        <div class="value" id="rate30">—</div>
+        <div class="unit">aut./h</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Tempo netto 1 h</div>
+        <div class="value" id="rate1">—</div>
+        <div class="unit">aut./h</div>
+      </div>
+
     </div>
 
-    <div
-      id="modelDetails">
+    <p class="small">
+      Uwaga: tempo netto kolejki nie jest tym samym co liczba samochodów
+      odprawionych na godzinę. Jest to zmiana obserwowanej liczby pojazdów
+      w danych API.
+    </p>
+
+  </div>
+
+
+  <!-- INFORMACJE -->
+  <div class="section">
+
+    <h2>ℹ️ Informacje</h2>
+
+    <div class="small">
+
+      <p>
+        <b>Ostatnia aktualizacja danych:</b>
+        <span id="updatedAt">—</span>
+      </p>
+
+      <p>
+        <b>Strefa czasowa urządzenia:</b>
+        <span id="timezone">—</span>
+      </p>
+
+      <p>
+        <b>Źródło modelu:</b>
+        dane zbierane automatycznie z monitoringu Brest BTS.
+      </p>
+
     </div>
 
   </div>
 
 
-  <!-- =========================================
-       INFORMACJE
-  ========================================== -->
+  <div id="status" class="status">
+    Ładowanie danych...
+  </div>
 
-  <div class="section">
 
-    <h2>
-      ℹ️ Jak działa prognoza?
-    </h2>
-
-    <div class="note">
-
-      Kalkulator wykorzystuje rzeczywiste czasy
-      od rejestracji samochodu do jego powołania.
-
-      <br><br>
-
-      <strong>Mediana</strong> pokazuje typowy czas
-      oczekiwania.
-
-      <br>
-
-      <strong>P75</strong> jest wariantem bardziej
-      ostrożnym.
-
-      <br>
-
-      <strong>P90</strong> jest wariantem bardzo
-      ostrożnym.
-
-      <br><br>
-
-      Model jest obecnie w fazie uczenia. Kolektor
-      zapisuje nowy pomiar co 15 minut. Wraz ze
-      wzrostem liczby obserwacji będziemy mogli
-      uwzględnić również dłuższą historię oraz
-      zachowanie kolejki w różnych porach dnia
-      i w weekendy.
-
-    </div>
-
+  <div class="footer">
+    Projekt monitorowania kolejki Brest → Terespol.
+    Dane mają charakter orientacyjny i nie gwarantują dokładnego czasu wywołania.
   </div>
 
 </div>
@@ -571,797 +416,683 @@
 
 <script>
 
-/*
-====================================================
- KONFIGURACJA
-====================================================
-*/
+  /*
+   * ============================================================
+   * KONFIGURACJA SUPABASE
+   * ============================================================
+   */
 
-const SUPABASE_URL =
-  "https://fxunctikzhxvtdddorkp.supabase.co";
+  const SUPABASE_URL =
+    "https://fxunctikzhxvtdddorkp.supabase.co";
 
-const SUPABASE_KEY =
-  "sb_publishable_R3009GBuhlJ5_xD_0LOY0A_gDgsEwEK";
-
-const CHECKPOINT_ID =
-  "a9173a85-3fc0-424c-84f0-defa632481e4";
+  const SUPABASE_KEY =
+    "sb_publishable_R3009GBuhlJ5_xD_0LOY0A_gDgsEwEK";
 
 
-/*
-====================================================
- AKTUALNY MODEL
-====================================================
-*/
+  /*
+   * ============================================================
+   * FUNKCJA POBIERANIA DANYCH Z SUPABASE
+   *
+   * WAŻNE:
+   * używamy tylko "apikey".
+   *
+   * NIE dodajemy:
+   *
+   * Authorization: Bearer ...
+   *
+   * ponieważ sb_publishable_... nie jest JWT.
+   * ============================================================
+   */
 
-let currentModel = null;
+  async function supabaseFetch(path) {
 
+    const url =
+      SUPABASE_URL +
+      "/rest/v1/" +
+      path;
 
-/*
-====================================================
- SUPABASE
-====================================================
-*/
+    const response = await fetch(url, {
 
-async function supabaseFetch(
-  table,
-  query
-) {
-
-  const url =
-    SUPABASE_URL +
-    "/rest/v1/" +
-    table +
-    "?" +
-    query;
-
-
-  const response =
-    await fetch(
-      url,
-      {
-        headers: {
-          "apikey": SUPABASE_KEY,
-          "Authorization":
-            "Bearer " + SUPABASE_KEY
-        }
+      headers: {
+        "apikey": SUPABASE_KEY
       }
-    );
 
+    });
 
-  if (!response.ok) {
+    if (!response.ok) {
 
-    throw new Error(
-      table +
-      " HTTP " +
-      response.status
-    );
-
-  }
-
-
-  return response.json();
-
-}
-
-
-/*
-====================================================
- FORMAT LICZBY
-====================================================
-*/
-
-function numberValue(
-  value,
-  decimals = 1
-) {
-
-  if (
-    value === null ||
-    value === undefined ||
-    Number.isNaN(Number(value))
-  ) {
-
-    return "—";
-
-  }
-
-
-  return Number(value)
-    .toFixed(decimals);
-
-}
-
-
-/*
-====================================================
- FORMAT CZASU
-====================================================
-*/
-
-function formatLocal(
-  iso
-) {
-
-  return new Intl.DateTimeFormat(
-    undefined,
-    {
-      dateStyle: "short",
-      timeStyle: "medium"
-    }
-  ).format(
-    new Date(iso)
-  );
-
-}
-
-
-/*
-====================================================
- FORMAT GODZINY
-====================================================
-*/
-
-function formatDateTime(
-  date
-) {
-
-  return new Intl.DateTimeFormat(
-    undefined,
-    {
-      dateStyle: "short",
-      timeStyle: "short"
-    }
-  ).format(date);
-
-}
-
-
-/*
-====================================================
- ŁADOWANIE MODELU
-====================================================
-*/
-
-async function loadModel() {
-
-  try {
-
-    const rows =
-      await supabaseFetch(
-
-        "queue_model_v2",
-
-        "checkpoint_id=eq." +
-        CHECKPOINT_ID +
-
-        "&select=*" +
-
-        "&limit=1"
-
-      );
-
-
-    if (!rows.length) {
+      const text = await response.text();
 
       throw new Error(
-        "Brak danych w queue_model_v2"
+        path +
+        " HTTP " +
+        response.status +
+        ": " +
+        text
+      );
+    }
+
+    return response.json();
+  }
+
+
+  /*
+   * ============================================================
+   * FORMATOWANIE DATY
+   * ============================================================
+   */
+
+  function formatDateTime(value) {
+
+    if (!value) {
+      return "—";
+    }
+
+    const date = new Date(value);
+
+    if (isNaN(date.getTime())) {
+      return "—";
+    }
+
+    return new Intl.DateTimeFormat(
+      navigator.language || "pl-PL",
+      {
+        dateStyle: "medium",
+        timeStyle: "short"
+      }
+    ).format(date);
+  }
+
+
+  /*
+   * ============================================================
+   * LICZBA
+   * ============================================================
+   */
+
+  function number(value, decimals = 0) {
+
+    if (
+      value === null ||
+      value === undefined ||
+      isNaN(Number(value))
+    ) {
+      return "—";
+    }
+
+    return Number(value).toFixed(decimals);
+  }
+
+
+  /*
+   * ============================================================
+   * FORMATOWANIE GODZIN OCZEKIWANIA
+   * ============================================================
+   */
+
+  function formatHours(hours) {
+
+    if (
+      hours === null ||
+      hours === undefined ||
+      isNaN(Number(hours))
+    ) {
+      return "—";
+    }
+
+    const totalMinutes =
+      Math.round(Number(hours) * 60);
+
+    const days =
+      Math.floor(totalMinutes / 1440);
+
+    const remaining =
+      totalMinutes % 1440;
+
+    const h =
+      Math.floor(remaining / 60);
+
+    const m =
+      remaining % 60;
+
+    if (days > 0) {
+
+      return (
+        days +
+        " d " +
+        h +
+        " h " +
+        m +
+        " min"
       );
 
     }
 
-
-    currentModel =
-      rows[0];
-
-
-    updatePage(
-      currentModel
+    return (
+      h +
+      " h " +
+      m +
+      " min"
     );
-
   }
-
-  catch (error) {
-
-    console.error(error);
-
-
-    document.getElementById(
-      "status"
-    ).innerHTML =
-
-      '<div class="error">' +
-
-      "Błąd pobierania modelu: " +
-
-      error.message +
-
-      "</div>";
-
-  }
-
-}
-
-
-/*
-====================================================
- AKTUALIZACJA STRONY
-====================================================
-*/
-
-function updatePage(
-  model
-) {
-
-  /*
-  ----------------------------------------------
-  AKTUALNY STAN
-  ----------------------------------------------
-  */
-
-  document.getElementById(
-    "waiting"
-  ).textContent =
-    model.waiting_cars ?? "—";
-
-
-  document.getElementById(
-    "called"
-  ).textContent =
-    model.called_cars ?? "—";
 
 
   /*
-  ----------------------------------------------
-  ZMIANA 1H
-  ----------------------------------------------
-  */
+   * ============================================================
+   * DOM
+   * ============================================================
+   */
+
+  const waitingCars =
+    document.getElementById("waitingCars");
+
+  const calledCars =
+    document.getElementById("calledCars");
+
+  const monitoringCount =
+    document.getElementById("monitoringCount");
 
   const change1h =
-    model.change_1h;
+    document.getElementById("change1h");
+
+  const p25 =
+    document.getElementById("p25");
+
+  const median =
+    document.getElementById("median");
+
+  const p75 =
+    document.getElementById("p75");
+
+  const p90 =
+    document.getElementById("p90");
+
+  const modelStatus =
+    document.getElementById("modelStatus");
+
+  const change30 =
+    document.getElementById("change30");
+
+  const change1 =
+    document.getElementById("change1");
+
+  const rate30 =
+    document.getElementById("rate30");
+
+  const rate1 =
+    document.getElementById("rate1");
+
+  const updatedAt =
+    document.getElementById("updatedAt");
+
+  const timezone =
+    document.getElementById("timezone");
+
+  const status =
+    document.getElementById("status");
+
+  const targetDate =
+    document.getElementById("targetDate");
+
+  const scenario =
+    document.getElementById("scenario");
+
+  const targetDisplay =
+    document.getElementById("targetDisplay");
+
+  const registrationDisplay =
+    document.getElementById("registrationDisplay");
+
+  const calculationInfo =
+    document.getElementById("calculationInfo");
 
 
-  document.getElementById(
-    "change1h"
-  ).textContent =
+  /*
+   * ============================================================
+   * STREFA CZASOWA
+   * ============================================================
+   */
 
-    change1h === null
-      ? "—"
-      : (
-          Number(change1h) > 0
-            ? "+" + change1h
-            : change1h
+  timezone.textContent =
+    Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+
+  /*
+   * ============================================================
+   * DANE MODELU
+   * ============================================================
+   */
+
+  let model = null;
+
+
+  /*
+   * ============================================================
+   * POBRANIE MODELU
+   * ============================================================
+   */
+
+  async function loadModel() {
+
+    try {
+
+      status.className = "status";
+
+      status.textContent =
+        "Pobieranie aktualnych danych...";
+
+
+      const rows =
+        await supabaseFetch(
+          "queue_model_v2?select=*&order=latest_at.desc&limit=1"
         );
 
 
-  /*
-  ----------------------------------------------
-  ZMIANA 30 MIN
-  ----------------------------------------------
-  */
+      if (!rows || rows.length === 0) {
 
-  document.getElementById(
-    "change30"
-  ).textContent =
-
-    model.change_30min === null
-      ? "—"
-      : (
-          Number(model.change_30min) > 0
-            ? "+" + model.change_30min
-            : model.change_30min
+        throw new Error(
+          "Brak danych w queue_model_v2"
         );
+      }
 
 
-  /*
-  ----------------------------------------------
-  TEMPO NETTO
-  ----------------------------------------------
-  */
+      model = rows[0];
 
-  document.getElementById(
-    "rate30"
-  ).textContent =
-    numberValue(
-      model.net_queue_rate_30m,
-      1
-    );
 
+      /*
+       * AKTUALNY STAN
+       */
 
-  /*
-  ----------------------------------------------
-  STATYSTYKI OCZEKIWANIA
-  ----------------------------------------------
-  */
+      waitingCars.textContent =
+        number(model.waiting_cars);
 
-  document.getElementById(
-    "median"
-  ).textContent =
-    numberValue(
-      model.median_hours,
-      2
-    );
+      calledCars.textContent =
+        number(model.called_cars);
 
+      monitoringCount.textContent =
+        number(model.monitoring_count);
 
-  document.getElementById(
-    "p75"
-  ).textContent =
-    numberValue(
-      model.p75_hours,
-      2
-    );
 
+      /*
+       * STATYSTYKA CZASU
+       */
 
-  document.getElementById(
-    "p90"
-  ).textContent =
-    numberValue(
-      model.p90_hours,
-      2
-    );
+      p25.textContent =
+        number(model.p25_hours, 2);
 
+      median.textContent =
+        number(model.median_hours, 2);
 
-  /*
-  ----------------------------------------------
-  TREND
-  ----------------------------------------------
-  */
+      p75.textContent =
+        number(model.p75_hours, 2);
 
-  const trend =
-    document.getElementById(
-      "trendText"
-    );
+      p90.textContent =
+        number(model.p90_hours, 2);
 
 
-  if (
-    model.change_1h !== null &&
-    Number(model.change_1h) < 0
-  ) {
+      /*
+       * DYNAMIKA
+       */
 
-    trend.className =
-      "trend good";
+      change30.textContent =
+        number(model.change_30min);
 
+      change1.textContent =
+        number(model.change_1h);
 
-    trend.textContent =
-      "↓ Kolejka maleje. " +
-      "W ostatniej godzinie stan zmniejszył się o " +
-      Math.abs(
-        Number(model.change_1h)
-      ) +
-      " aut.";
+      change1h.textContent =
+        number(model.change_1h);
 
-  }
+      rate30.textContent =
+        number(model.net_queue_rate_30m, 2);
 
-  else if (
-    model.change_1h !== null &&
-    Number(model.change_1h) > 0
-  ) {
+      rate1.textContent =
+        number(model.net_queue_rate_1h, 2);
 
-    trend.className =
-      "trend warning";
 
+      /*
+       * STATUS MODELU
+       */
 
-    trend.textContent =
-      "↑ Kolejka rośnie. " +
-      "W ostatniej godzinie przybyło " +
-      Number(model.change_1h) +
-      " aut.";
+      if (model.model_status) {
 
-  }
+        modelStatus.textContent =
+          model.model_status;
 
-  else {
+      } else {
 
-    trend.className =
-      "trend muted";
+        modelStatus.textContent =
+          "Model działa";
 
+      }
 
-    trend.textContent =
-      "→ Brak wystarczających danych "
-      + "do określenia trendu.";
 
-  }
+      /*
+       * DATA AKTUALIZACJI
+       */
 
+      updatedAt.textContent =
+        formatDateTime(model.latest_at);
 
-  /*
-  ----------------------------------------------
-  JAKOŚĆ MODELU
-  ----------------------------------------------
-  */
 
-  const quality =
-    document.getElementById(
-      "modelQuality"
-    );
+      /*
+       * KOMUNIKAT
+       */
 
+      if (
+        model.has_6h_queue_history === false
+      ) {
 
-  const details =
-    document.getElementById(
-      "modelDetails"
-    );
+        status.className =
+          "status warning";
 
+        status.textContent =
+          "Model wstępny — zbieramy jeszcze historię kolejki. " +
+          "Czas oczekiwania jest obecnie liczony głównie " +
+          "na podstawie rzeczywistych zakończonych przejazdów.";
 
-  quality.innerHTML =
-    '<span class="badge">' +
-    (model.model_status || "brak statusu") +
-    "</span>";
+      } else {
 
+        status.className =
+          "status ok";
 
-  details.innerHTML =
+        status.textContent =
+          "Model działa na podstawie aktualnej historii danych.";
 
-    '<div class="note">' +
+      }
 
-    "Zakończone obserwacje: <strong>" +
 
-    (model.completed_events ?? "—") +
+      /*
+       * PRZELICZENIE CELU
+       */
 
-    "</strong><br>" +
+      calculateTarget();
 
-    "Historia 6 h: <strong>" +
 
-    (
-      model.has_6h_queue_history
-        ? "tak"
-        : "jeszcze nie"
-    ) +
+    } catch (error) {
 
-    "</strong><br>" +
+      console.error(error);
 
-    "Próba ≥100 obserwacji: <strong>" +
+      status.className =
+        "status error";
 
-    (
-      model.has_large_wait_sample
-        ? "tak"
-        : "jeszcze nie"
-    ) +
+      status.textContent =
+        "Błąd pobierania modelu: " +
+        error.message;
 
-    "</strong><br>" +
+      modelStatus.textContent =
+        "Błąd";
 
-    "Korekta dynamiczna: <strong>" +
-
-    numberValue(
-      model.dynamic_adjustment_hours,
-      2
-    ) +
-
-    " h</strong>" +
-
-    "</div>";
-
-
-  /*
-  ----------------------------------------------
-  STATUS AKTUALIZACJI
-  ----------------------------------------------
-  */
-
-  document.getElementById(
-    "status"
-  ).textContent =
-
-    "Ostatnia aktualizacja: " +
-
-    formatLocal(
-      model.latest_at
-    );
-
-}
-
-
-/*
-====================================================
- KALKULATOR
-====================================================
-*/
-
-function calculateTarget() {
-
-  if (!currentModel) {
-
-    alert(
-      "Model danych nie jest jeszcze załadowany."
-    );
-
-    return;
-
-  }
-
-
-  const date =
-    document.getElementById(
-      "targetDate"
-    ).value;
-
-
-  const time =
-    document.getElementById(
-      "targetTime"
-    ).value;
-
-
-  if (!date || !time) {
-
-    alert(
-      "Wybierz datę i godzinę."
-    );
-
-    return;
+    }
 
   }
 
 
   /*
-  ----------------------------------------------
-  CEL
-  ----------------------------------------------
-  */
+   * ============================================================
+   * KALKULATOR CELU
+   * ============================================================
+   */
 
-  const target =
-    new Date(
-      date +
-      "T" +
-      time
-    );
+  function calculateTarget() {
 
-
-  /*
-  ----------------------------------------------
-  CZASY
-  ----------------------------------------------
-  */
-
-  const medianHours =
-    Number(
-      currentModel.median_hours
-    );
+    if (!model) {
+      return;
+    }
 
 
-  const p75Hours =
-    Number(
-      currentModel.p75_hours
-    );
+    const value =
+      targetDate.value;
+
+    if (!value) {
+
+      targetDisplay.textContent =
+        "—";
+
+      registrationDisplay.textContent =
+        "—";
+
+      calculationInfo.textContent =
+        "Wybierz datę i godzinę.";
+
+      return;
+    }
 
 
-  const p90Hours =
-    Number(
-      currentModel.p90_hours
-    );
+    const target =
+      new Date(value);
 
 
-  if (
-    !Number.isFinite(medianHours) ||
-    !Number.isFinite(p75Hours) ||
-    !Number.isFinite(p90Hours)
-  ) {
+    if (isNaN(target.getTime())) {
 
-    alert(
-      "Brak wystarczających danych do obliczenia prognozy."
-    );
+      calculationInfo.textContent =
+        "Nieprawidłowa data.";
 
-    return;
+      return;
+    }
 
+
+    let waitHours =
+      Number(model.median_hours);
+
+
+    if (scenario.value === "p75") {
+
+      waitHours =
+        Number(model.p75_hours);
+
+    }
+
+
+    if (scenario.value === "p90") {
+
+      waitHours =
+        Number(model.p90_hours);
+
+    }
+
+
+    if (
+      !isFinite(waitHours) ||
+      waitHours <= 0
+    ) {
+
+      calculationInfo.textContent =
+        "Brak wystarczających danych do obliczenia.";
+
+      return;
+    }
+
+
+    /*
+     * COFAMY SIĘ O PRZEWIDYWANY CZAS
+     */
+
+    const registration =
+      new Date(
+        target.getTime() -
+        waitHours * 60 * 60 * 1000
+      );
+
+
+    /*
+     * WYŚWIETLAMY W LOKALNEJ STREFIE URZĄDZENIA
+     */
+
+    targetDisplay.textContent =
+      formatDateTime(target);
+
+    registrationDisplay.textContent =
+      formatDateTime(registration);
+
+
+    let scenarioName =
+      "medianę";
+
+    if (scenario.value === "p75") {
+      scenarioName = "P75";
+    }
+
+    if (scenario.value === "p90") {
+      scenarioName = "P90";
+    }
+
+
+    calculationInfo.textContent =
+      "Obliczenie używa " +
+      scenarioName +
+      " = " +
+      number(waitHours, 2) +
+      " h. " +
+      "Godziny są wyświetlane według strefy czasowej urządzenia.";
   }
 
 
   /*
-  ----------------------------------------------
-  TERMINY REJESTRACJI
-  ----------------------------------------------
-  */
+   * ============================================================
+   * REAKCJA NA ZMIANĘ DATY
+   * ============================================================
+   */
 
-  const medianRegistration =
-    new Date(
-      target.getTime() -
-      medianHours *
-      3600000
-    );
+  targetDate.addEventListener(
+    "change",
+    calculateTarget
+  );
 
-
-  const p75Registration =
-    new Date(
-      target.getTime() -
-      p75Hours *
-      3600000
-    );
-
-
-  const p90Registration =
-    new Date(
-      target.getTime() -
-      p90Hours *
-      3600000
-    );
-
-
-  /*
-  ----------------------------------------------
-  WYNIK
-  ----------------------------------------------
-  */
-
-  const result =
-    document.getElementById(
-      "result"
-    );
-
-
-  result.style.display =
-    "block";
-
-
-  result.innerHTML =
-
-    "<div>" +
-    "🎯 <strong>Twój cel:</strong>" +
-    "</div>" +
-
-    '<div class="result-big">' +
-
-    formatDateTime(
-      target
-    ) +
-
-    "</div>" +
-
-
-    '<div class="result-row">' +
-
-    "🟢 <strong>Typowy wariant</strong>" +
-
-    '<div class="result-big">' +
-
-    formatDateTime(
-      medianRegistration
-    ) +
-
-    "</div>" +
-
-    "Mediana: " +
-
-    numberValue(
-      medianHours,
-      2
-    ) +
-
-    " h" +
-
-    "</div>" +
-
-
-    '<div class="result-row">' +
-
-    "🟡 <strong>Bezpieczniejszy wariant</strong>" +
-
-    '<div class="result-big">' +
-
-    formatDateTime(
-      p75Registration
-    ) +
-
-    "</div>" +
-
-    "P75: " +
-
-    numberValue(
-      p75Hours,
-      2
-    ) +
-
-    " h" +
-
-    "</div>" +
-
-
-    '<div class="result-row">' +
-
-    "🔴 <strong>Bardzo ostrożny wariant</strong>" +
-
-    '<div class="result-big">' +
-
-    formatDateTime(
-      p90Registration
-    ) +
-
-    "</div>" +
-
-    "P90: " +
-
-    numberValue(
-      p90Hours,
-      2
-    ) +
-
-    " h" +
-
-    "</div>" +
-
-
-    '<div class="note">' +
-
-    "Czasy są wyświetlane według strefy " +
-
-    "czasowej Twojego urządzenia. " +
-
-    "Prognoza jest orientacyjna i nie stanowi " +
-
-    "gwarancji godziny powołania." +
-
-    "</div>";
-
-}
-
-
-/*
-====================================================
- DOMYŚLNA DATA
-====================================================
-*/
-
-function setDefaultDate() {
-
-  const now =
-    new Date();
-
-
-  now.setDate(
-    now.getDate() + 3
+  scenario.addEventListener(
+    "change",
+    calculateTarget
   );
 
 
-  const yyyy =
-    now.getFullYear();
+  /*
+   * ============================================================
+   * DOMYŚLNY CEL
+   *
+   * Ustawiamy najbliższą niedzielę 09:30.
+   *
+   * Jeśli użytkownik chce inną datę,
+   * może ją normalnie zmienić.
+   * ============================================================
+   */
+
+  function setDefaultTarget() {
+
+    const now =
+      new Date();
+
+    const target =
+      new Date(now);
+
+    const day =
+      now.getDay();
+
+    /*
+     * JavaScript:
+     * niedziela = 0
+     */
+
+    let daysUntilSunday =
+      (7 - day) % 7;
 
 
-  const mm =
-    String(
-      now.getMonth() + 1
-    ).padStart(
-      2,
-      "0"
+    /*
+     * Jeśli dzisiaj jest niedziela,
+     * a godzina już minęła, wybieramy następną niedzielę.
+     */
+
+    if (
+      daysUntilSunday === 0 &&
+      (
+        now.getHours() > 9 ||
+        (
+          now.getHours() === 9 &&
+          now.getMinutes() >= 30
+        )
+      )
+    ) {
+
+      daysUntilSunday = 7;
+
+    }
+
+
+    target.setDate(
+      now.getDate() +
+      daysUntilSunday
+    );
+
+    target.setHours(
+      9,
+      30,
+      0,
+      0
     );
 
 
-  const dd =
-    String(
-      now.getDate()
-    ).padStart(
-      2,
-      "0"
-    );
+    /*
+     * datetime-local wymaga formatu:
+     * YYYY-MM-DDTHH:mm
+     */
+
+    const year =
+      target.getFullYear();
+
+    const month =
+      String(
+        target.getMonth() + 1
+      ).padStart(2, "0");
+
+    const dayNumber =
+      String(
+        target.getDate()
+      ).padStart(2, "0");
+
+    const hours =
+      String(
+        target.getHours()
+      ).padStart(2, "0");
+
+    const minutes =
+      String(
+        target.getMinutes()
+      ).padStart(2, "0");
 
 
-  document.getElementById(
-    "targetDate"
-  ).value =
-
-    yyyy +
-    "-" +
-    mm +
-    "-" +
-    dd;
-
-}
-
-
-/*
-====================================================
- START
-====================================================
-*/
-
-setDefaultDate();
-
-loadModel();
+    targetDate.value =
+      year +
+      "-" +
+      month +
+      "-" +
+      dayNumber +
+      "T" +
+      hours +
+      ":" +
+      minutes;
+  }
 
 
-/*
-====================================================
- AUTOMATYCZNE ODŚWIEŻANIE
-====================================================
-*/
+  /*
+   * ============================================================
+   * START
+   * ============================================================
+   */
 
-setInterval(
-  loadModel,
-  60 * 1000
-);
+  setDefaultTarget();
+
+  loadModel();
+
+
+  /*
+   * ============================================================
+   * AUTOMATYCZNE ODŚWIEŻANIE STRONY CO 5 MINUT
+   * ============================================================
+   */
+
+  setInterval(
+    loadModel,
+    5 * 60 * 1000
+  );
 
 </script>
 
