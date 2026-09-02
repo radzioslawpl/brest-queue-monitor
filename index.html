@@ -410,6 +410,119 @@ select {
 }
 
 
+.alert-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 16px 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+}
+
+.alert-copy {
+  flex: 1;
+  min-width: 240px;
+}
+
+.alert-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.alert-description {
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.alert-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.alert-state {
+  min-width: 105px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.alert-state.on {
+  color: #059669;
+}
+
+.alert-state.off {
+  color: #6b7280;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 54px;
+  height: 30px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #d1d5db;
+  border-radius: 30px;
+  transition: .2s;
+}
+
+.slider:before {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  left: 4px;
+  top: 4px;
+  background: white;
+  border-radius: 50%;
+  transition: .2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.switch input:checked + .slider {
+  background: #059669;
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(24px);
+}
+
+.switch input:disabled + .slider {
+  cursor: wait;
+  opacity: .65;
+}
+
+.alert-status-message {
+  margin-top: 10px;
+  min-height: 18px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.alert-status-message.success {
+  color: #059669;
+}
+
+.alert-status-message.error {
+  color: #dc2626;
+}
+
 @media (max-width: 900px) {
 
   .cards,
@@ -812,6 +925,69 @@ select {
 
   </div>
 
+
+
+
+  <!-- ========================================================
+       ALERTY E-MAIL
+       ======================================================== -->
+
+  <div class="section">
+
+    <h2>
+      Alerty e-mail
+    </h2>
+
+    <div class="chart-description">
+      Otrzymasz wiadomość, gdy kolejka przekroczy ustawione
+      progi: 100, 150, 200, 300, 400 lub 500 samochodów.
+      Po spadku kolejki poniżej 80 samochodów progi uzbrajają
+      się ponownie.
+    </div>
+
+    <div class="alert-panel">
+
+      <div class="alert-copy">
+
+        <div class="alert-title">
+          Wysyłka alertów
+        </div>
+
+        <div class="alert-description">
+          Przełącznik steruje wysyłką wiadomości e-mail.
+          Gdy jest wyłączony, kolejka nadal jest monitorowana,
+          ale żadne alerty nie są wysyłane.
+        </div>
+
+      </div>
+
+      <div class="alert-control">
+
+        <div
+          id="alertState"
+          class="alert-state off"
+        >
+          WYŁĄCZONE
+        </div>
+
+        <label class="switch">
+          <input
+            id="alertToggle"
+            type="checkbox"
+          >
+          <span class="slider"></span>
+        </label>
+
+      </div>
+
+    </div>
+
+    <div
+      id="alertStatusMessage"
+      class="alert-status-message"
+    ></div>
+
+  </div>
 
 
   <!-- ========================================================
@@ -1299,6 +1475,188 @@ async function supabaseFetch(path) {
 
   return response.json();
 }
+
+
+
+/* ================================================================
+   ALERTY E-MAIL
+   ================================================================ */
+
+let alertToggleBusy = false;
+
+async function loadAlertSettings() {
+
+  const rows =
+    await supabaseFetch(
+      "alert_settings?select=enabled,email_1,email_2,thresholds,reset_below&checkpoint_id=eq." +
+      CHECKPOINT_ID +
+      "&limit=1"
+    );
+
+  if (!rows || rows.length === 0) {
+    throw new Error(
+      "Brak ustawień alertów"
+    );
+  }
+
+  const settings = rows[0];
+
+  const enabled =
+    Boolean(settings.enabled);
+
+  $("alertToggle").checked =
+    enabled;
+
+  updateAlertVisualState(
+    enabled
+  );
+
+  return settings;
+}
+
+
+function updateAlertVisualState(
+  enabled
+) {
+
+  const state =
+    $("alertState");
+
+  state.textContent =
+    enabled
+      ? "WŁĄCZONE"
+      : "WYŁĄCZONE";
+
+  state.classList.toggle(
+    "on",
+    enabled
+  );
+
+  state.classList.toggle(
+    "off",
+    !enabled
+  );
+}
+
+
+async function saveAlertEnabled(
+  enabled
+) {
+
+  if (alertToggleBusy) {
+    return;
+  }
+
+  alertToggleBusy = true;
+
+  const toggle =
+    $("alertToggle");
+
+  const message =
+    $("alertStatusMessage");
+
+  toggle.disabled = true;
+
+  message.className =
+    "alert-status-message";
+
+  message.textContent =
+    "Zapisywanie…";
+
+  try {
+
+    const response =
+      await fetch(
+        SUPABASE_URL +
+        "/rest/v1/alert_settings?checkpoint_id=eq." +
+        CHECKPOINT_ID,
+        {
+          method: "PATCH",
+
+          headers: {
+            "apikey": SUPABASE_KEY,
+
+            "Content-Type":
+              "application/json",
+
+            "Prefer":
+              "return=minimal"
+          },
+
+          body: JSON.stringify({
+            enabled: Boolean(
+              enabled
+            )
+          })
+        }
+      );
+
+    if (!response.ok) {
+
+      const text =
+        await response.text();
+
+      throw new Error(
+        response.status +
+        ": " +
+        text
+      );
+    }
+
+    updateAlertVisualState(
+      enabled
+    );
+
+    message.className =
+      "alert-status-message success";
+
+    message.textContent =
+      enabled
+        ? "Alerty e-mail są włączone."
+        : "Alerty e-mail są wyłączone.";
+
+  } catch (error) {
+
+    console.error(
+      "Alert settings update error:",
+      error
+    );
+
+    // Cofnięcie przełącznika,
+    // jeśli zapis się nie udał.
+    toggle.checked =
+      !enabled;
+
+    updateAlertVisualState(
+      !enabled
+    );
+
+    message.className =
+      "alert-status-message error";
+
+    message.textContent =
+      "Nie udało się zapisać ustawienia: " +
+      error.message;
+
+  } finally {
+
+    toggle.disabled = false;
+    alertToggleBusy = false;
+  }
+}
+
+
+$("alertToggle")
+  .addEventListener(
+    "change",
+    function() {
+
+      saveAlertEnabled(
+        this.checked
+      );
+
+    }
+  );
 
 
 /* ================================================================
@@ -2885,7 +3243,8 @@ async function refreshAll() {
 
     await Promise.all([
       loadModel(),
-      loadChartData()
+      loadChartData(),
+      loadAlertSettings()
     ]);
 
 
