@@ -7,6 +7,7 @@
 <title>Brest Queue Monitor</title>
 
 <style>
+
 * {
   box-sizing: border-box;
 }
@@ -346,34 +347,46 @@ select {
   padding: 10px 0 30px;
 }
 
-.error {
-  color: #dc2626;
-}
+
+/* ============================================================
+   TOOLTIP
+   ============================================================ */
 
 #chartTooltip {
   position: fixed;
   display: none;
+
   background: #111827;
   color: white;
+
   padding: 11px 13px;
+
   border-radius: 9px;
+
   font-size: 13px;
   line-height: 1.55;
+
   pointer-events: none;
-  z-index: 9999;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.20);
-  min-width: 170px;
+
+  z-index: 99999;
+
+  box-shadow:
+    0 4px 15px rgba(0,0,0,0.20);
+
+  min-width: 190px;
 }
 
 .tooltip-time {
   font-weight: 700;
-  margin-bottom: 5px;
+  margin-bottom: 7px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
 }
 
 .tooltip-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
 }
 
 .tooltip-dot {
@@ -396,15 +409,21 @@ select {
   background: #fbbf24;
 }
 
+
 @media (max-width: 900px) {
+
   .cards,
   .stats-grid,
   .dynamics-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
+
 }
 
+
 @media (max-width: 650px) {
+
   .container {
     padding: 14px;
   }
@@ -427,13 +446,21 @@ select {
   .chart-wrap {
     height: 310px;
   }
+
 }
+
 </style>
 </head>
+
 
 <body>
 
 <div class="container">
+
+
+  <!-- ========================================================
+       HEADER
+       ======================================================== -->
 
   <h1>Brest Queue Monitor</h1>
 
@@ -445,7 +472,9 @@ select {
   </div>
 
 
-  <!-- AKTUALNY STAN -->
+  <!-- ========================================================
+       AKTUALNY STAN
+       ======================================================== -->
 
   <div class="section">
 
@@ -453,7 +482,9 @@ select {
 
     <div class="cards">
 
+
       <div class="card">
+
         <div class="card-title">
           Oczekujące samochody
         </div>
@@ -469,10 +500,12 @@ select {
           Samochody ze statusem oczekiwania
           widoczne w aktualnym odczycie monitoringu.
         </div>
+
       </div>
 
 
       <div class="card">
+
         <div class="card-title">
           Wywołane samochody
         </div>
@@ -489,10 +522,12 @@ select {
           czyli takie, których kolej została
           już osiągnięta.
         </div>
+
       </div>
 
 
       <div class="card">
+
         <div class="card-title">
           Monitoring
         </div>
@@ -508,10 +543,12 @@ select {
           Łączna liczba rekordów widocznych
           w bieżącym wycinku monitoringu.
         </div>
+
       </div>
 
 
       <div class="card">
+
         <div class="card-title">
           Ostatnia aktualizacja
         </div>
@@ -528,7 +565,9 @@ select {
           Moment ostatniego pobrania danych
           przez kolektor.
         </div>
+
       </div>
+
 
     </div>
 
@@ -544,7 +583,9 @@ select {
 
 
 
-  <!-- WYKRES -->
+  <!-- ========================================================
+       WYKRES
+       ======================================================== -->
 
   <div class="section">
 
@@ -557,12 +598,12 @@ select {
         </h2>
 
         <div class="chart-description">
-          Trzy linie pokazują jednocześnie:
-          liczbę oczekujących, wywołanych oraz
-          wszystkich rekordów widocznych
-          w monitoringu.
-          Najedź na punkt, aby zobaczyć
-          dokładny odczyt.
+          Na wykresie znajdują się trzy linie:
+          <strong>oczekujące</strong>,
+          <strong>wywołane</strong> oraz
+          <strong>monitoring</strong>.
+          Najedź na dowolną godzinę, aby zobaczyć
+          dokładne wartości wszystkich trzech serii.
         </div>
 
       </div>
@@ -599,18 +640,41 @@ select {
     <div class="chart-legend">
 
       <div class="legend-item">
-        <span class="legend-line legend-waiting"></span>
-        <span>Oczekujące</span>
+
+        <span
+          class="legend-line legend-waiting"
+        ></span>
+
+        <span>
+          Oczekujące
+        </span>
+
       </div>
 
-      <div class="legend-item">
-        <span class="legend-line legend-called"></span>
-        <span>Wywołane</span>
-      </div>
 
       <div class="legend-item">
-        <span class="legend-line legend-monitoring"></span>
-        <span>Monitoring</span>
+
+        <span
+          class="legend-line legend-called"
+        ></span>
+
+        <span>
+          Wywołane
+        </span>
+
+      </div>
+
+
+      <div class="legend-item">
+
+        <span
+          class="legend-line legend-monitoring"
+        ></span>
+
+        <span>
+          Monitoring
+        </span>
+
       </div>
 
     </div>
@@ -625,7 +689,9 @@ select {
 
 
 
-  <!-- CZASY OCZEKIWANIA -->
+  <!-- ========================================================
+       STATYSTYKA CZASU
+       ======================================================== -->
 
   <div class="section">
 
@@ -641,6 +707,7 @@ select {
 
 
     <div class="stats-grid">
+
 
       <div class="stat-box">
 
@@ -728,6 +795,7 @@ select {
 
       </div>
 
+
     </div>
 
 
@@ -746,7 +814,9 @@ select {
 
 
 
-  <!-- KALKULATOR -->
+  <!-- ========================================================
+       KALKULATOR
+       ======================================================== -->
 
   <div class="section">
 
@@ -763,6 +833,7 @@ select {
 
 
     <div class="calculator">
+
 
       <div class="input-group">
 
@@ -840,7 +911,7 @@ select {
         </label>
 
         <div class="input-description">
-          Czas kalkulatora pochodzi z ustawień
+          Kalkulator korzysta z lokalnej
           strefy czasowej urządzenia.
         </div>
 
@@ -875,13 +946,16 @@ select {
 
       </div>
 
+
     </div>
 
   </div>
 
 
 
-  <!-- DYNAMIKA -->
+  <!-- ========================================================
+       DYNAMIKA
+       ======================================================== -->
 
   <div class="section">
 
@@ -897,6 +971,7 @@ select {
 
 
     <div class="dynamics-grid">
+
 
       <div class="dynamic-box">
 
@@ -982,13 +1057,16 @@ select {
 
       </div>
 
+
     </div>
 
   </div>
 
 
 
-  <!-- WYJAŚNIENIE -->
+  <!-- ========================================================
+       WYJAŚNIENIE
+       ======================================================== -->
 
   <div class="section">
 
@@ -1037,6 +1115,7 @@ select {
 
     </div>
 
+
   </div>
 
 
@@ -1048,7 +1127,16 @@ select {
 
   </div>
 
+
 </div>
+
+
+
+<!-- ============================================================
+     TOOLTIP
+     ============================================================ -->
+
+<div id="chartTooltip"></div>
 
 
 
@@ -1075,6 +1163,8 @@ const CHECKPOINT_ID =
 let chartRangeHours = 24;
 
 let chartData = [];
+
+let selectedChartPoint = null;
 
 
 /* ================================================================
@@ -1143,11 +1233,13 @@ function formatSigned(value) {
     return "—";
   }
 
-  const n = Number(value);
+  const n =
+    Number(value);
 
   return (
     n > 0 ? "+" : ""
-  ) + n.toFixed(0);
+  ) +
+  n.toFixed(0);
 }
 
 
@@ -1161,16 +1253,19 @@ function formatRate(value) {
     return "—";
   }
 
-  const n = Number(value);
+  const n =
+    Number(value);
 
   return (
     n > 0 ? "+" : ""
-  ) + n.toFixed(1) + " / h";
+  ) +
+  n.toFixed(1) +
+  " / h";
 }
 
 
 /* ================================================================
-   FETCH
+   SUPABASE FETCH
    ================================================================ */
 
 async function supabaseFetch(path) {
@@ -1402,7 +1497,7 @@ async function loadChartData() {
 
 
 /* ================================================================
-   WYKRES 3 LINIE
+   WYKRES
    ================================================================ */
 
 function drawChart() {
@@ -1528,20 +1623,26 @@ function drawChart() {
     marginBottom;
 
 
-  /*
-   * Wszystkie trzy serie trafiają
-   * na tę samą skalę.
-   */
-
   const allValues = [];
 
-  visible.forEach(item => {
 
-    allValues.push(item.waiting);
-    allValues.push(item.called);
-    allValues.push(item.monitoring);
+  visible.forEach(
+    item => {
 
-  });
+      allValues.push(
+        item.waiting
+      );
+
+      allValues.push(
+        item.called
+      );
+
+      allValues.push(
+        item.monitoring
+      );
+
+    }
+  );
 
 
   let minValue =
@@ -1617,7 +1718,9 @@ function drawChart() {
   }
 
 
-  /* GRID */
+  /* ============================================================
+     SIATKA
+     ============================================================ */
 
   ctx.strokeStyle =
     "#e5e7eb";
@@ -1690,7 +1793,9 @@ function drawChart() {
   }
 
 
-  /* OŚ CZASU */
+  /* ============================================================
+     OŚ CZASU
+     ============================================================ */
 
   ctx.fillStyle =
     "#6b7280";
@@ -1763,7 +1868,7 @@ function drawChart() {
 
 
   /* ============================================================
-     FUNKCJA RYSUJĄCA SERIĘ
+     RYSOWANIE SERII
      ============================================================ */
 
   function drawSeries(
@@ -1825,9 +1930,7 @@ function drawChart() {
     ctx.stroke();
 
 
-    /*
-     * Punkty
-     */
+    /* Punkty */
 
     visible.forEach(
       item => {
@@ -1867,10 +1970,9 @@ function drawChart() {
 
 
   /*
-   * Kolejność ma znaczenie:
-   * monitoring najpierw,
-   * potem wywołane,
-   * potem oczekujące.
+   * Monitoring rysujemy pierwszy,
+   * następnie wywołane,
+   * na końcu oczekujące.
    */
 
   drawSeries(
@@ -1889,6 +1991,45 @@ function drawChart() {
     "waiting",
     "#2563eb"
   );
+
+
+  /* ============================================================
+     OSTATNI PUNKT
+     ============================================================ */
+
+  const last =
+    visible[
+      visible.length - 1
+    ];
+
+
+  const lastX =
+    xFor(
+      last.time.getTime()
+    );
+
+
+  const lastY =
+    yFor(
+      last.waiting
+    );
+
+
+  ctx.beginPath();
+
+  ctx.arc(
+    lastX,
+    lastY,
+    5,
+    0,
+    Math.PI * 2
+  );
+
+
+  ctx.fillStyle =
+    "#1d4ed8";
+
+  ctx.fill();
 
 
   /* ============================================================
@@ -1925,11 +2066,114 @@ function drawChart() {
       })
     );
 
+
+  /* ============================================================
+     PODŚWIETLENIE AKTYWNEGO PUNKTU
+     ============================================================ */
+
+  if (
+    selectedChartPoint
+  ) {
+
+    const point =
+      selectedChartPoint;
+
+
+    /*
+     * Pionowa linia.
+     */
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      point.x,
+      marginTop
+    );
+
+    ctx.lineTo(
+      point.x,
+      marginTop +
+      chartHeight
+    );
+
+
+    ctx.strokeStyle =
+      "#9ca3af";
+
+    ctx.lineWidth = 1;
+
+    ctx.setLineDash(
+      [5, 5]
+    );
+
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+
+
+    /*
+     * Duże punkty.
+     */
+
+    [
+      {
+        y: point.waitingY,
+        color: "#2563eb"
+      },
+      {
+        y: point.calledY,
+        color: "#059669"
+      },
+      {
+        y: point.monitoringY,
+        color: "#d97706"
+      }
+    ].forEach(
+      item => {
+
+        ctx.beginPath();
+
+        ctx.arc(
+          point.x,
+          item.y,
+          6,
+          0,
+          Math.PI * 2
+        );
+
+
+        ctx.fillStyle =
+          "#ffffff";
+
+        ctx.fill();
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+          point.x,
+          item.y,
+          4,
+          0,
+          Math.PI * 2
+        );
+
+
+        ctx.fillStyle =
+          item.color;
+
+        ctx.fill();
+
+      }
+    );
+
+  }
+
 }
 
 
 /* ================================================================
-   ZNAJDŹ NAJBLIŻSZY PUNKT
+   NAJBLIŻSZY PUNKT
    ================================================================ */
 
 function findChartPoint(
@@ -1960,26 +2204,20 @@ function findChartPoint(
     rect.left;
 
 
-  const y =
-    clientY -
-    rect.top;
-
-
   let nearest = null;
 
   let distance = Infinity;
 
 
+  /*
+   * Szukamy po osi X.
+   *
+   * Nie trzeba trafić dokładnie
+   * w jedną z trzech linii.
+   */
+
   canvas._chartPoints.forEach(
     point => {
-
-      /*
-       * Szukamy przede wszystkim
-       * najbliższej godziny na osi X.
-       *
-       * Dzięki temu nie trzeba trafić
-       * dokładnie w jedną z trzech linii.
-       */
 
       const dx =
         Math.abs(
@@ -2001,8 +2239,12 @@ function findChartPoint(
   );
 
 
+  /*
+   * 40 px tolerancji.
+   */
+
   if (
-    distance > 30
+    distance > 40
   ) {
 
     return null;
@@ -2019,19 +2261,19 @@ function findChartPoint(
    TOOLTIP
    ================================================================ */
 
-let chartTooltip =
-  $("chartTooltip");
-
-
 function showChartTooltip(
   point,
   clientX,
   clientY
 ) {
 
+  const tooltip =
+    $("chartTooltip");
+
+
   if (!point) {
 
-    chartTooltip.style.display =
+    tooltip.style.display =
       "none";
 
     return;
@@ -2067,7 +2309,7 @@ function showChartTooltip(
     );
 
 
-  chartTooltip.innerHTML =
+  tooltip.innerHTML =
 
     '<div class="tooltip-time">' +
       date +
@@ -2076,52 +2318,67 @@ function showChartTooltip(
     "</div>" +
 
     '<div class="tooltip-row">' +
+
       '<span class="tooltip-dot tooltip-blue"></span>' +
+
       "Oczekujące: <strong>" +
       formatNumber(
         data.waiting
       ) +
       "</strong>" +
+
     "</div>" +
 
     '<div class="tooltip-row">' +
+
       '<span class="tooltip-dot tooltip-green"></span>' +
+
       "Wywołane: <strong>" +
       formatNumber(
         data.called
       ) +
       "</strong>" +
+
     "</div>" +
 
     '<div class="tooltip-row">' +
+
       '<span class="tooltip-dot tooltip-orange"></span>' +
+
       "Monitoring: <strong>" +
       formatNumber(
         data.monitoring
       ) +
       "</strong>" +
+
     "</div>";
 
 
-  chartTooltip.style.display =
+  tooltip.style.display =
     "block";
 
 
   let left =
-    clientX + 14;
+    clientX + 15;
 
 
   let top =
-    clientY + 14;
+    clientY + 15;
 
 
   const tooltipWidth =
-    chartTooltip.offsetWidth;
+    tooltip.offsetWidth;
 
 
   const tooltipHeight =
-    chartTooltip.offsetHeight;
+    tooltip.offsetHeight;
 
+
+  /*
+   * Jeżeli tooltip wyszedłby
+   * poza prawą krawędź ekranu,
+   * pokazujemy go po lewej stronie.
+   */
 
   if (
     left +
@@ -2132,10 +2389,14 @@ function showChartTooltip(
     left =
       clientX -
       tooltipWidth -
-      14;
+      15;
 
   }
 
+
+  /*
+   * To samo dla dołu ekranu.
+   */
 
   if (
     top +
@@ -2146,12 +2407,12 @@ function showChartTooltip(
     top =
       clientY -
       tooltipHeight -
-      14;
+      15;
 
   }
 
 
-  chartTooltip.style.left =
+  tooltip.style.left =
     Math.max(
       10,
       left
@@ -2159,7 +2420,7 @@ function showChartTooltip(
     "px";
 
 
-  chartTooltip.style.top =
+  tooltip.style.top =
     Math.max(
       10,
       top
@@ -2170,7 +2431,7 @@ function showChartTooltip(
 
 
 /* ================================================================
-   HOVER
+   HOVER MYSZKĄ
    ================================================================ */
 
 $("queueChart")
@@ -2183,6 +2444,13 @@ $("queueChart")
           event.clientX,
           event.clientY
         );
+
+
+      selectedChartPoint =
+        point;
+
+
+      drawChart();
 
 
       showChartTooltip(
@@ -2200,7 +2468,15 @@ $("queueChart")
     "mouseleave",
     function() {
 
-      chartTooltip.style.display =
+      selectedChartPoint =
+        null;
+
+
+      drawChart();
+
+
+      $("chartTooltip")
+        .style.display =
         "none";
 
     }
@@ -2208,7 +2484,7 @@ $("queueChart")
 
 
 /* ================================================================
-   TELEFON
+   TELEFON / TABLET
    ================================================================ */
 
 $("queueChart")
@@ -2239,6 +2515,13 @@ $("queueChart")
 
       if (point) {
 
+        selectedChartPoint =
+          point;
+
+
+        drawChart();
+
+
         showChartTooltip(
           point,
           touch.clientX,
@@ -2259,11 +2542,22 @@ $("queueChart")
     "touchend",
     function() {
 
+      /*
+       * Na telefonie tooltip zostaje
+       * przez 4 sekundy.
+       */
+
       setTimeout(
         function() {
 
-          chartTooltip.style.display =
+          $("chartTooltip")
+            .style.display =
             "none";
+
+          selectedChartPoint =
+            null;
+
+          drawChart();
 
         },
         4000
@@ -2277,10 +2571,16 @@ $("queueChart")
    ZAKRES WYKRESU
    ================================================================ */
 
-function setChartRange(hours) {
+function setChartRange(
+  hours
+) {
 
   chartRangeHours =
     hours;
+
+
+  selectedChartPoint =
+    null;
 
 
   $("chart6h")
@@ -2371,6 +2671,7 @@ function calculateRegistration() {
     $("registrationResult")
       .textContent =
       "—";
+
 
     $("registrationDescription")
       .textContent =
@@ -2508,7 +2809,7 @@ function updateTimezoneInfo() {
 
 
 /* ================================================================
-   DOM
+   EVENTY KALKULATORA
    ================================================================ */
 
 $("targetDate")
@@ -2629,7 +2930,7 @@ refreshAll();
 
 
 /*
- * Odświeżenie co minutę.
+ * Odświeżenie strony co minutę.
  */
 
 setInterval(
@@ -2645,6 +2946,9 @@ setInterval(
 window.addEventListener(
   "resize",
   function() {
+
+    selectedChartPoint =
+      null;
 
     drawChart();
 
