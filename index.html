@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Brest Queue Monitor</title>
 
   <style>
@@ -85,17 +86,6 @@
       margin-top: 0;
     }
 
-    .chart-wrap {
-      width: 100%;
-      overflow-x: auto;
-    }
-
-    svg {
-      width: 100%;
-      min-width: 650px;
-      height: 260px;
-    }
-
     .target-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -145,6 +135,13 @@
       margin: 6px 0;
     }
 
+    .recommendation {
+      margin-top: 15px;
+      padding: 16px;
+      border-radius: 10px;
+      background: #eef6ff;
+    }
+
     .note {
       font-size: 13px;
       color: #68727d;
@@ -160,8 +157,43 @@
       margin-top: 15px;
     }
 
+    .good {
+      color: #176b35;
+    }
+
+    .warning {
+      color: #9a6700;
+    }
+
+    .muted {
+      color: #68727d;
+    }
+
+    .model-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .model-box {
+      background: #f7f8fa;
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .model-box strong {
+      display: block;
+      font-size: 20px;
+      margin-top: 5px;
+    }
+
     @media (max-width: 800px) {
       .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .model-grid {
         grid-template-columns: repeat(2, 1fr);
       }
     }
@@ -172,6 +204,10 @@
       }
 
       .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .model-grid {
         grid-template-columns: 1fr 1fr;
       }
 
@@ -191,89 +227,173 @@
 <div class="container">
 
   <header>
-    <h1>🚗 Brest Queue Monitor</h1>
+
+    <h1>
+      🚗 Brest Queue Monitor
+    </h1>
 
     <div class="subtitle">
       Elektroniczna kolejka Brest → Polska
     </div>
 
-    <div class="status" id="status">
+    <div
+      class="status"
+      id="status">
       Łączenie z bazą danych...
     </div>
+
   </header>
 
 
-  <!-- AKTUALNE DANE -->
+  <!-- AKTUALNY STAN -->
 
   <div class="grid">
 
     <div class="card">
+
       <div class="label">
         Samochody oczekujące
       </div>
 
-      <div class="value" id="waiting">
+      <div
+        class="value"
+        id="waiting">
         —
       </div>
+
     </div>
 
 
     <div class="card">
+
       <div class="label">
         Powołane / widoczne
       </div>
 
-      <div class="value" id="called">
+      <div
+        class="value"
+        id="called">
         —
       </div>
+
     </div>
 
 
     <div class="card">
+
       <div class="label">
-        Przepustowość
+        Zmiana 1 h
       </div>
 
-      <div class="value">
-        <span id="rate">—</span>
-        <span class="unit">aut/h</span>
+      <div
+        class="value"
+        id="change1h">
+        —
       </div>
+
+      <span class="unit">
+        aut
+      </span>
+
     </div>
 
 
     <div class="card">
+
       <div class="label">
         Mediana oczekiwania
       </div>
 
       <div class="value">
-        <span id="median">22.89</span>
-        <span class="unit">h</span>
+
+        <span id="median">
+          —
+        </span>
+
+        <span class="unit">
+          h
+        </span>
+
       </div>
+
     </div>
 
   </div>
 
 
-  <!-- TREND -->
+  <!-- DYNAMIKA -->
 
   <div class="section">
 
     <h2>
-      Trend kolejki
+      📉 Dynamika kolejki
     </h2>
 
     <div id="trendText">
       Ładowanie...
     </div>
 
-    <div class="chart-wrap">
 
-      <svg
-        id="chart"
-        viewBox="0 0 900 260"
-        preserveAspectRatio="none">
-      </svg>
+    <div class="model-grid">
+
+      <div class="model-box">
+
+        Ostatnie 30 min
+
+        <strong id="rate30">
+          —
+        </strong>
+
+        <span class="unit">
+          aut/h
+        </span>
+
+      </div>
+
+
+      <div class="model-box">
+
+        Ostatnia 1 h
+
+        <strong id="rate1">
+          —
+        </strong>
+
+        <span class="unit">
+          aut/h
+        </span>
+
+      </div>
+
+
+      <div class="model-box">
+
+        P75 oczekiwania
+
+        <strong id="p75">
+          —
+        </strong>
+
+        <span class="unit">
+          h
+        </span>
+
+      </div>
+
+
+      <div class="model-box">
+
+        P90 oczekiwania
+
+        <strong id="p90">
+          —
+        </strong>
+
+        <span class="unit">
+          h
+        </span>
+
+      </div>
 
     </div>
 
@@ -291,6 +411,7 @@
     <div class="target-grid">
 
       <div>
+
         <label for="targetDate">
           Data
         </label>
@@ -298,10 +419,12 @@
         <input
           id="targetDate"
           type="date">
+
       </div>
 
 
       <div>
+
         <label for="targetTime">
           Godzina
         </label>
@@ -310,13 +433,17 @@
           id="targetTime"
           type="time"
           value="09:30">
+
       </div>
 
     </div>
 
 
-    <button onclick="calculateTarget()">
+    <button
+      onclick="calculateTarget()">
+
       OBLICZ TERMIN REJESTRACJI
+
     </button>
 
 
@@ -324,6 +451,32 @@
       class="result"
       id="result"
       style="display:none">
+
+    </div>
+
+  </div>
+
+
+  <!-- JAKOŚĆ MODELU -->
+
+  <div class="section">
+
+    <h2>
+      📊 Jakość modelu
+    </h2>
+
+    <div id="modelQuality">
+      Ładowanie...
+    </div>
+
+    <div class="note">
+
+      Model korzysta z rzeczywistych obserwacji
+      czasu od rejestracji do powołania.
+
+      Im więcej samochodów zostanie zaobserwowanych,
+      tym stabilniejsze będą statystyki.
+
     </div>
 
   </div>
@@ -339,24 +492,24 @@
 
     <div class="note">
 
-      Dane są pobierane automatycznie z monitoringu kolejki
+      Dane są pobierane automatycznie z monitoringu
       i zapisywane w Supabase co 15 minut.
 
       <br><br>
 
-      Czasy w bazie są przechowywane w UTC.
-      Strona wyświetla czas zgodny ze strefą czasową urządzenia.
+      Czasy są przechowywane w UTC,
+      a strona wyświetla je zgodnie ze strefą
+      czasową urządzenia.
 
       <br><br>
 
-      <strong>Uwaga:</strong>
-      aktualna wersja kalkulatora wykorzystuje medianę
-      historycznego czasu oczekiwania.
+      <strong>
+        Ważne:
+      </strong>
 
-      Jest to wersja robocza modelu.
-
-      Wraz z kolejnymi danymi model będzie uwzględniał
-      dynamikę kolejki, przepustowość oraz napływ nowych samochodów.
+      aktualny model jest jeszcze wersją wstępną.
+      Nie traktuj prognozy jako gwarancji godziny
+      powołania.
 
     </div>
 
@@ -385,7 +538,7 @@ const CHECKPOINT_ID =
 
 /*
 ====================================================
- POBIERANIE DANYCH Z SUPABASE
+ SUPABASE
 ====================================================
 */
 
@@ -399,13 +552,14 @@ async function supabaseFetch(table, query) {
     query;
 
 
-  const response = await fetch(url, {
+  const response =
+    await fetch(url, {
 
-    headers: {
-      "apikey": SUPABASE_KEY
-    }
+      headers: {
+        "apikey": SUPABASE_KEY
+      }
 
-  });
+    });
 
 
   if (!response.ok) {
@@ -426,7 +580,7 @@ async function supabaseFetch(table, query) {
 
 /*
 ====================================================
- CZAS LOKALNY URZĄDZENIA
+ FORMAT CZASU
 ====================================================
 */
 
@@ -447,200 +601,72 @@ function formatLocal(iso) {
 
 /*
 ====================================================
- ŁADOWANIE DANYCH
+ ZAOKRĄGLENIE
 ====================================================
 */
 
-async function loadData() {
+function round(value, decimals = 1) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    Number.isNaN(Number(value))
+  ) {
+    return "—";
+  }
+
+  return Number(value).toFixed(decimals);
+
+}
+
+
+/*
+====================================================
+ ŁADOWANIE MODELU
+====================================================
+*/
+
+let currentModel = null;
+
+
+async function loadModel() {
 
   try {
 
-    /*
-    ----------------------------------------------
-    OSTATNIE SNAPSHOTY
-    ----------------------------------------------
-    */
-
-    const snapshots =
+    const rows =
       await supabaseFetch(
 
-        "queue_snapshots",
+        "queue_model",
 
         "checkpoint_id=eq." +
         CHECKPOINT_ID +
 
-        "&select=" +
-        "captured_at," +
-        "waiting_cars," +
-        "called_cars," +
-        "monitoring_count" +
-
-        "&order=captured_at.desc" +
-
-        "&limit=96"
-
-      );
-
-
-    /*
-    ----------------------------------------------
-    PRZEPUSTOWOŚĆ
-    ----------------------------------------------
-    */
-
-    const stats =
-      await supabaseFetch(
-
-        "processing_stats",
-
-        "checkpoint_id=eq." +
-        CHECKPOINT_ID +
-
-        "&select=" +
-        "captured_at," +
-        "car_last_hour," +
-        "car_last_day" +
-
-        "&order=captured_at.desc" +
+        "&select=*" +
 
         "&limit=1"
 
       );
 
 
-    /*
-    ----------------------------------------------
-    BRAK DANYCH
-    ----------------------------------------------
-    */
-
-    if (!snapshots.length) {
+    if (!rows.length) {
 
       throw new Error(
-        "Brak danych w queue_snapshots"
+        "Brak danych w queue_model"
       );
 
     }
 
 
-    /*
-    ----------------------------------------------
-    NAJNOWSZY POMIAR
-    ----------------------------------------------
-    */
-
-    const latest =
-      snapshots[0];
+    currentModel =
+      rows[0];
 
 
-    document.getElementById(
-      "waiting"
-    ).textContent =
-      latest.waiting_cars;
-
-
-    document.getElementById(
-      "called"
-    ).textContent =
-      latest.called_cars;
-
-
-    /*
-    ----------------------------------------------
-    PRZEPUSTOWOŚĆ
-    ----------------------------------------------
-    */
-
-    if (stats.length) {
-
-      document.getElementById(
-        "rate"
-      ).textContent =
-        stats[0].car_last_hour;
-
-    }
-
-
-    /*
-    ----------------------------------------------
-    TREND
-    ----------------------------------------------
-    */
-
-    if (snapshots.length >= 2) {
-
-      const previous =
-        snapshots[1];
-
-
-      const diff =
-        latest.waiting_cars -
-        previous.waiting_cars;
-
-
-      if (diff < 0) {
-
-        document.getElementById(
-          "trendText"
-        ).textContent =
-          "↓ Kolejka obecnie maleje (" +
-          Math.abs(diff) +
-          " aut względem poprzedniego pomiaru).";
-
-      }
-
-      else if (diff > 0) {
-
-        document.getElementById(
-          "trendText"
-        ).textContent =
-          "↑ Kolejka obecnie rośnie (" +
-          diff +
-          " aut względem poprzedniego pomiaru).";
-
-      }
-
-      else {
-
-        document.getElementById(
-          "trendText"
-        ).textContent =
-          "→ Kolejka bez większej zmiany.";
-
-      }
-
-    }
-
-
-    /*
-    ----------------------------------------------
-    WYKRES
-    ----------------------------------------------
-    */
-
-    drawChart(
-      snapshots
-        .slice()
-        .reverse()
+    updatePage(
+      currentModel
     );
 
 
-    /*
-    ----------------------------------------------
-    STATUS
-    ----------------------------------------------
-    */
-
-    document.getElementById(
-      "status"
-    ).textContent =
-      "Ostatnia aktualizacja: " +
-      formatLocal(
-        latest.captured_at
-      );
-
   }
-
 
   catch (error) {
 
@@ -650,9 +676,13 @@ async function loadData() {
     document.getElementById(
       "status"
     ).innerHTML =
+
       '<div class="error">' +
-      "Błąd pobierania danych: " +
+
+      "Błąd pobierania modelu: " +
+
       error.message +
+
       "</div>";
 
   }
@@ -662,197 +692,242 @@ async function loadData() {
 
 /*
 ====================================================
- WYKRES
+ AKTUALIZACJA STRONY
 ====================================================
 */
 
-function drawChart(data) {
+function updatePage(model) {
 
-  const svg =
-    document.getElementById(
-      "chart"
-    );
+  /*
+  ----------------------------------------------
+  STAN KOLEJKI
+  ----------------------------------------------
+  */
 
-
-  svg.innerHTML = "";
-
-
-  if (!data.length) {
-    return;
-  }
+  document.getElementById(
+    "waiting"
+  ).textContent =
+    model.waiting_cars ?? "—";
 
 
-  const width = 900;
-  const height = 260;
-  const padding = 35;
+  document.getElementById(
+    "called"
+  ).textContent =
+    model.called_cars ?? "—";
 
 
-  const values =
-    data.map(
-      x => Number(
-        x.waiting_cars
-      )
-    );
+  /*
+  ----------------------------------------------
+  DYNAMIKA
+  ----------------------------------------------
+  */
+
+  document.getElementById(
+    "change1h"
+  ).textContent =
+
+    model.change_1h === null
+      ? "—"
+      : (
+          model.change_1h > 0
+            ? "+" + model.change_1h
+            : model.change_1h
+        );
 
 
-  const min =
-    Math.min(...values);
-
-
-  const max =
-    Math.max(...values);
-
-
-  const range =
-    Math.max(
-      max - min,
+  document.getElementById(
+    "rate30"
+  ).textContent =
+    round(
+      model.net_queue_rate_30m,
       1
     );
 
 
-  const points =
-    data.map(
-      (item, index) => {
-
-        const x =
-          padding +
-          (
-            index /
-            Math.max(
-              data.length - 1,
-              1
-            )
-          ) *
-          (
-            width -
-            padding * 2
-          );
-
-
-        const y =
-          height -
-          padding -
-          (
-            (
-              item.waiting_cars -
-              min
-            ) /
-            range
-          ) *
-          (
-            height -
-            padding * 2
-          );
-
-
-        return x + "," + y;
-
-      }
-    ).join(" ");
-
-
-  const polyline =
-    document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "polyline"
+  document.getElementById(
+    "rate1"
+  ).textContent =
+    round(
+      model.net_queue_rate_1h,
+      1
     );
-
-
-  polyline.setAttribute(
-    "points",
-    points
-  );
-
-
-  polyline.setAttribute(
-    "fill",
-    "none"
-  );
-
-
-  polyline.setAttribute(
-    "stroke",
-    "currentColor"
-  );
-
-
-  polyline.setAttribute(
-    "stroke-width",
-    "3"
-  );
-
-
-  svg.appendChild(
-    polyline
-  );
 
 
   /*
   ----------------------------------------------
-  MIN
+  CZAS OCZEKIWANIA
   ----------------------------------------------
   */
 
-  const labelMin =
-    document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "text"
+  document.getElementById(
+    "median"
+  ).textContent =
+    round(
+      model.median_hours,
+      2
     );
 
 
-  labelMin.setAttribute(
-    "x",
-    "10"
-  );
+  document.getElementById(
+    "p75"
+  ).textContent =
+    round(
+      model.p75_hours,
+      2
+    );
 
 
-  labelMin.setAttribute(
-    "y",
-    height - padding
-  );
-
-
-  labelMin.textContent =
-    Math.round(min);
-
-
-  svg.appendChild(
-    labelMin
-  );
+  document.getElementById(
+    "p90"
+  ).textContent =
+    round(
+      model.p90_hours,
+      2
+    );
 
 
   /*
   ----------------------------------------------
-  MAX
+  TREND
   ----------------------------------------------
   */
 
-  const labelMax =
-    document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "text"
+  const trend =
+    document.getElementById(
+      "trendText"
     );
 
 
-  labelMax.setAttribute(
-    "x",
-    "10"
-  );
+  if (
+    model.net_queue_rate_1h !== null &&
+    Number(model.net_queue_rate_1h) < 0
+  ) {
+
+    trend.innerHTML =
+
+      '<span class="good">' +
+
+      "↓ Kolejka maleje. " +
+
+      "W ostatniej godzinie stan zmniejszył się o " +
+
+      Math.abs(
+        model.change_1h
+      ) +
+
+      " aut." +
+
+      "</span>";
+
+  }
+
+  else if (
+    model.net_queue_rate_1h !== null &&
+    Number(model.net_queue_rate_1h) > 0
+  ) {
+
+    trend.innerHTML =
+
+      '<span class="warning">' +
+
+      "↑ Kolejka rośnie. " +
+
+      "W ostatniej godzinie przybyło około " +
+
+      model.change_1h +
+
+      " aut." +
+
+      "</span>";
+
+  }
+
+  else {
+
+    trend.textContent =
+      "→ Brak wystarczających danych do określenia trendu.";
+
+  }
 
 
-  labelMax.setAttribute(
-    "y",
-    "25"
-  );
+  /*
+  ----------------------------------------------
+  JAKOŚĆ
+  ----------------------------------------------
+  */
+
+  const quality =
+    document.getElementById(
+      "modelQuality"
+    );
 
 
-  labelMax.textContent =
-    Math.round(max);
+  let qualityText = "";
 
 
-  svg.appendChild(
-    labelMax
-  );
+  if (
+    model.data_quality ===
+    "mało danych"
+  ) {
+
+    qualityText =
+      "🔴 Mało danych — prognoza orientacyjna.";
+
+  }
+
+  else if (
+    model.data_quality ===
+    "wstępna"
+  ) {
+
+    qualityText =
+      "🟡 Wstępna — model ma " +
+      model.completed_events +
+      " zakończonych obserwacji.";
+
+  }
+
+  else if (
+    model.data_quality ===
+    "umiarkowana"
+  ) {
+
+    qualityText =
+      "🟢 Umiarkowana — model ma " +
+      model.completed_events +
+      " obserwacji.";
+
+  }
+
+  else {
+
+    qualityText =
+      "🟢 Dobra — model ma " +
+      model.completed_events +
+      " obserwacji.";
+
+  }
+
+
+  quality.textContent =
+    qualityText;
+
+
+  /*
+  ----------------------------------------------
+  STATUS
+  ----------------------------------------------
+  */
+
+  document.getElementById(
+    "status"
+  ).textContent =
+
+    "Ostatnia aktualizacja: " +
+
+    formatLocal(
+      model.latest_at
+    );
 
 }
 
@@ -864,6 +939,17 @@ function drawChart(data) {
 */
 
 function calculateTarget() {
+
+  if (!currentModel) {
+
+    alert(
+      "Model danych nie jest jeszcze załadowany."
+    );
+
+    return;
+
+  }
+
 
   const date =
     document.getElementById(
@@ -890,16 +976,6 @@ function calculateTarget() {
 
   /*
   ----------------------------------------------
-  OBECNA MEDIANA
-  ----------------------------------------------
-  */
-
-  const medianHours =
-    22.89;
-
-
-  /*
-  ----------------------------------------------
   CEL
   ----------------------------------------------
   */
@@ -914,17 +990,55 @@ function calculateTarget() {
 
   /*
   ----------------------------------------------
-  ORIENTACYJNA REJESTRACJA
+  CZASY MODELU
   ----------------------------------------------
   */
 
-  const registration =
+  const medianHours =
+    Number(
+      currentModel.median_hours
+    );
+
+
+  const p75Hours =
+    Number(
+      currentModel.p75_hours
+    );
+
+
+  const p90Hours =
+    Number(
+      currentModel.p90_hours
+    );
+
+
+  /*
+  ----------------------------------------------
+  REJESTRACJA
+  ----------------------------------------------
+  */
+
+  const medianRegistration =
     new Date(
       target.getTime() -
       medianHours *
-      60 *
-      60 *
-      1000
+      3600000
+    );
+
+
+  const p75Registration =
+    new Date(
+      target.getTime() -
+      p75Hours *
+      3600000
+    );
+
+
+  const p90Registration =
+    new Date(
+      target.getTime() -
+      p90Hours *
+      3600000
     );
 
 
@@ -946,47 +1060,90 @@ function calculateTarget() {
 
   result.innerHTML =
 
-    "<div>🎯 Cel:</div>" +
+    "<div>🎯 <strong>Cel powołania:</strong></div>" +
 
     '<div class="result-big">' +
+
     target.toLocaleString() +
+
     "</div>" +
 
-    "<div>Orientacyjna rejestracja:</div>" +
 
-    '<div class="result-big">' +
-    registration.toLocaleString() +
+    '<div class="recommendation">' +
+
+    "<strong>Najbardziej prawdopodobnie:</strong>" +
+
+    "<div class=\"result-big\">" +
+
+    medianRegistration.toLocaleString() +
+
     "</div>" +
+
+    "na podstawie mediany " +
+
+    round(
+      medianHours,
+      2
+    ) +
+
+    " h" +
+
+    "</div>" +
+
+
+    '<div class="recommendation">' +
+
+    "<strong>Bezpieczniejszy wariant:</strong>" +
+
+    "<div class=\"result-big\">" +
+
+    p75Registration.toLocaleString() +
+
+    "</div>" +
+
+    "na podstawie P75 " +
+
+    round(
+      p75Hours,
+      2
+    ) +
+
+    " h" +
+
+    "</div>" +
+
+
+    '<div class="recommendation">' +
+
+    "<strong>Bardzo ostrożny wariant:</strong>" +
+
+    "<div class=\"result-big\">" +
+
+    p90Registration.toLocaleString() +
+
+    "</div>" +
+
+    "na podstawie P90 " +
+
+    round(
+      p90Hours,
+      2
+    ) +
+
+    " h" +
+
+    "</div>" +
+
 
     '<div class="note">' +
 
-    "Obliczenie wykorzystuje obecną " +
-    "medianę oczekiwania: " +
+    "To nadal prognoza, nie gwarancja. " +
 
-    medianHours.toFixed(2) +
+    "Model uwzględnia obecnie rzeczywisty rozkład " +
 
-    " h (" +
+    "czasów oczekiwania. W kolejnych etapach " +
 
-    Math.floor(
-      medianHours
-    ) +
-
-    " h " +
-
-    Math.round(
-      (
-        medianHours % 1
-      ) * 60
-    ) +
-
-    " min)." +
-
-    "<br><br>" +
-
-    "To jeszcze nie jest przedział bezpieczeństwa. " +
-
-    "Model będziemy udoskonalać na podstawie " +
-    "kolejnych automatycznych pomiarów." +
+    "dodamy korektę wynikającą z dynamiki kolejki." +
 
     "</div>";
 
@@ -1005,6 +1162,10 @@ function setDefaultDate() {
     new Date();
 
 
+  /*
+  Domyślnie trzy dni do przodu.
+  */
+
   now.setDate(
     now.getDate() + 3
   );
@@ -1017,18 +1178,25 @@ function setDefaultDate() {
   const mm =
     String(
       now.getMonth() + 1
-    ).padStart(2, "0");
+    ).padStart(
+      2,
+      "0"
+    );
 
 
   const dd =
     String(
       now.getDate()
-    ).padStart(2, "0");
+    ).padStart(
+      2,
+      "0"
+    );
 
 
   document.getElementById(
     "targetDate"
   ).value =
+
     yyyy +
     "-" +
     mm +
@@ -1046,17 +1214,17 @@ function setDefaultDate() {
 
 setDefaultDate();
 
-loadData();
+loadModel();
 
 
 /*
 ====================================================
- AUTOMATYCZNE ODŚWIEŻANIE
+ ODŚWIEŻANIE
 ====================================================
 */
 
 setInterval(
-  loadData,
+  loadModel,
   60 * 1000
 );
 
